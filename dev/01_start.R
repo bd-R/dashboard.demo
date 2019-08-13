@@ -10,13 +10,13 @@
 
 golem::fill_desc(
   pkg_name = "bdvisDashboard", # The Name of the package containing the App 
-  pkg_title = "PKG_TITLE", # The Title of the package containing the App 
-  pkg_description = "PKG_DESC.", # The Description of the package containing the App 
-  author_first_name = "AUTHOR_FIRST", # Your First Name
-  author_last_name = "AUTHOR_LAST",  # Your Last Name
-  author_email = "AUTHOR@MAIL.COM",      # Your Email
-  repo_url = NULL # The (optional) URL of the GitHub Repo
-)     
+  pkg_title = "Dashboard For biodiversity data visualization", # The Title of the package containing the App 
+  pkg_description = "The bdvisDashboard allow user to visualization biodiversity data. This is a easy to use shiny dashboard which allow to visualize different aspect of biodiversity data such as temporal, taxonomic, spatial.", # The Description of the package containing the App 
+  author_first_name = "Rahul", # Your First Name
+  author_last_name = "chauhan",  # Your Last Name
+  author_email = "rahul.chauhan049@gmail.com",      # Your Email
+  repo_url = "https://github.com/rahulchauhan049/dashboard.demo" # The (optional) URL of the GitHub Repo
+)    
 
 ## Use this desc to set {golem} options
 

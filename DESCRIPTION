@@ -1,8 +1,8 @@
 Package: bdvisDashboard
-Title: An Amazing Shiny App
+Title: Dashboard For biodiversity data visualization
 Version: 0.0.0.9000
-Authors@R: person("firstname", "lastname", email = "your@email.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Authors@R: person('Rahul', 'chauhan', email = 'rahul.chauhan049@gmail.com', role = c('cre', 'aut'))
+Description: The bdvisDashboard allow user to visualization biodiversity data. This is a easy to use shiny dashboard which allow to visualize different aspect of biodiversity data such as temporal, taxonomic, spatial.
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
@@ -10,3 +10,5 @@ Imports:
     shiny, 
     golem
 RoxygenNote: 6.1.1
+URL: https://github.com/rahulchauhan049/dashboard.demo
+BugReports: https://github.com/rahulchauhan049/dashboard.demo/issues
