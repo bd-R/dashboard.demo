@@ -31,8 +31,11 @@ mod_dataInput_ui <- function(id) {
                 selectizeInput(
                   ns("dataSet"),
                   "Select Sample Datasets",
-                  choices = c("Mammals", "Hyena", "Puma Concolor"),
-                  selected = "Puma Concolor"
+                  choices = c("Mammals"=1,
+                              "Hyena"=2,
+                              "Puma Concolor"=3
+                            ),
+                  selected = 3
                 ),
                 div(
                   class = "activeButton",
@@ -69,7 +72,7 @@ mod_dataInput_ui <- function(id) {
                     "Without Coordinates" = "2",
                     "No Filter" = "3"
                   ),
-                  selected = 3
+                  selected = "3"
                 ),
                 
                 radioButtons(
@@ -225,13 +228,11 @@ mod_dataInput_server <-
     #when user click on button called load existing dataset
     observeEvent(
       input$loadexisting, {
-        if (input$dataSet == "Mammals") {
-          returnData <<- mammals
-        } else if (input$dataSet == "Hyena") {
-          returnData <<- hyena
-        } else if (input$dataSet == "Puma Concolor") {
-          returnData <<- pumaConcolor
-        }
+        returnData <<- switch(as.integer(input$dataSet),
+                              mammals,
+                              hyena,
+                              pumaConcolor
+                              )
         dataLoadedTask(returnData)
       }
     )

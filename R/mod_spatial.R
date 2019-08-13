@@ -233,21 +233,6 @@ mod_spatial_server <- function(input, output, session, data) {
     select <- event_data("plotly_click", source = "barCountrt")
     if (is.null(select)) {
       output$pie <- renderPlotly({
-        if (input$pieselect == "kingdom") {
-          label <- ~ kingdom
-        } else if (input$pieselect == "phylum") {
-          label <- ~ phylum
-        } else if (input$pieselect == "family") {
-          label <- ~ family
-        } else if (input$pieselect == "genus") {
-          label <- ~ genus
-        } else if (input$pieselect == "species") {
-          label <- ~ species
-        } else if (input$pieselect == "order") {
-          label <- ~ order
-        } else {
-          label <- ~ basisOfRecord
-        }
         if (!nrow(data()[-which(data()[, input$pieselect] == ""),]) == 0) {
           dataa <- data()[-which(data()[, input$pieselect] == ""),]
         } else {
@@ -262,7 +247,15 @@ mod_spatial_server <- function(input, output, session, data) {
                                  "family",
                                  "genus",
                                  "species")]),
-          labels = label,
+          labels = label <- switch(input$pieselect,
+                                   "basisOfRecord" = ~basisOfRecord,
+                                   "kingdom" = ~kingdom,
+                                   "phylum" =  ~phylum,
+                                   "phylum"  = ~phylum,
+                                   "family" = ~family,
+                                   "genus" = ~genus,
+                                   "species" = ~species
+          ),
           type = 'pie',
           textposition = 'inside',
           textinfo = 'label+percent',
@@ -284,21 +277,6 @@ mod_spatial_server <- function(input, output, session, data) {
       newData <- data() %>% 
         filter(countryCode %in% select$x)
       output$pie <- renderPlotly({
-        if (input$pieselect == "kingdom") {
-          label <- ~ kingdom
-        } else if (input$pieselect == "phylum") {
-          label <- ~ phylum
-        } else if (input$pieselect == "family") {
-          label <- ~ family
-        } else if (input$pieselect == "genus") {
-          label <- ~ genus
-        } else if (input$pieselect == "species") {
-          label <- ~ species
-        } else if (input$pieselect == "order") {
-          label <- ~ order
-        } else {
-          label <- ~ basisOfRecord
-        }
         #Remove blank data from column(Blank! Not NA)
         if (!nrow(newData[-which(newData[, input$pieselect] == ""),]) == 0) {
           newData <- newData[-which(newData[, input$pieselect] == ""),]
@@ -312,7 +290,15 @@ mod_spatial_server <- function(input, output, session, data) {
                                    "family",
                                    "genus",
                                    "species")]),
-          labels = label,
+          labels = label <- switch(input$pieselect,
+                                   "basisOfRecord" = ~basisOfRecord,
+                                   "kingdom" = ~kingdom,
+                                   "phylum" =  ~phylum,
+                                   "phylum"  = ~phylum,
+                                   "family" = ~family,
+                                   "genus" = ~genus,
+                                   "species" = ~species
+          ),
           type = 'pie',
           textposition = 'inside',
           textinfo = 'label+percent',
@@ -336,21 +322,6 @@ mod_spatial_server <- function(input, output, session, data) {
     select <- event_data("plotly_selected", source = "barCountrt")
     if (is.null(select)) {
       output$pie <- renderPlotly({
-        if (input$pieselect == "kingdom") {
-          label <- ~ kingdom
-        } else if (input$pieselect == "phylum") {
-          label <- ~ phylum
-        } else if (input$pieselect == "family") {
-          label <- ~ family
-        } else if (input$pieselect == "genus") {
-          label <- ~ genus
-        } else if (input$pieselect == "species") {
-          label <- ~ species
-        } else if (input$pieselect == "order") {
-          label <- ~ order
-        } else {
-          label <- ~ basisOfRecord
-        }
         if (!nrow(data()[-which(data()[, input$pieselect] == ""),]) == 0) {
           dataa <- data()[-which(data()[, input$pieselect] == ""),]
         } else {
@@ -365,7 +336,15 @@ mod_spatial_server <- function(input, output, session, data) {
                                  "family",
                                  "genus",
                                  "species")]),
-          labels = label,
+          labels = label <- switch(input$pieselect,
+                                   "basisOfRecord" = ~basisOfRecord,
+                                   "kingdom" = ~kingdom,
+                                   "phylum" =  ~phylum,
+                                   "phylum"  = ~phylum,
+                                   "family" = ~family,
+                                   "genus" = ~genus,
+                                   "species" = ~species
+          ),
           type = 'pie',
           textposition = 'inside',
           textinfo = 'label+percent',
@@ -387,21 +366,6 @@ mod_spatial_server <- function(input, output, session, data) {
       newData <- data() %>% 
         filter(countryCode %in% select$x)
       output$pie <- renderPlotly({
-        if (input$pieselect == "kingdom") {
-          label <- ~ kingdom
-        } else if (input$pieselect == "phylum") {
-          label <- ~ phylum
-        } else if (input$pieselect == "family") {
-          label <- ~ family
-        } else if (input$pieselect == "genus") {
-          label <- ~ genus
-        } else if (input$pieselect == "species") {
-          label <- ~ species
-        } else if (input$pieselect == "order") {
-          label <- ~ order
-        } else {
-          label <- ~ basisOfRecord
-        }
         #Remove blank data from column(Blank! Not NA)
         if (!nrow(newData[-which(newData[, input$pieselect] == ""),]) == 0) {
           newData <- newData[-which(newData[, input$pieselect] == ""),]
@@ -415,7 +379,15 @@ mod_spatial_server <- function(input, output, session, data) {
                                    "family",
                                    "genus",
                                    "species")]),
-          labels = label,
+          labels = label <- switch(input$pieselect,
+                                   "basisOfRecord" = ~basisOfRecord,
+                                   "kingdom" = ~kingdom,
+                                   "phylum" =  ~phylum,
+                                   "phylum"  = ~phylum,
+                                   "family" = ~family,
+                                   "genus" = ~genus,
+                                   "species" = ~species
+          ),
           type = 'pie',
           textposition = 'inside',
           textinfo = 'label+percent',

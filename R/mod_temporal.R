@@ -183,21 +183,15 @@ mod_temporal_server <-
       select <- event_data("plotly_click", source = "barselected")
       if (is.null(select)) {
         output$pie <- renderPlotly({
-          if (input$pieselect == "kingdom") {
-            label <- ~ kingdom
-          } else if (input$pieselect == "phylum") {
-            label <- ~ phylum
-          } else if (input$pieselect == "family") {
-            label <- ~ family
-          } else if (input$pieselect == "genus") {
-            label <- ~ genus
-          } else if (input$pieselect == "species") {
-            label <- ~ species
-          } else if (input$pieselect == "order") {
-            label <- ~ order
-          } else {
-            label <- ~ basisOfRecord
-          }
+          label <- switch(input$pieselect,
+                          "basisOfRecord" = ~basisOfRecord,
+                          "kingdom" = ~kingdom,
+                          "phylum" =  ~phylum,
+                          "phylum"  = ~phylum,
+                          "family" = ~family,
+                          "genus" = ~genus,
+                          "species" = ~species
+          )
           if (!nrow(dataTemporal()[-which(dataTemporal()[, input$pieselect] == ""), ]) == 0) {
             dataa <-
               dataTemporal()[-which(dataTemporal()[, input$pieselect] == ""), ]
@@ -235,21 +229,15 @@ mod_temporal_server <-
           dataTemporal() %>%
           filter(year %in% as.numeric(select))
         output$pie <- renderPlotly({
-          if (input$pieselect == "kingdom") {
-            label <- ~ kingdom
-          } else if (input$pieselect == "phylum") {
-            label <- ~ phylum
-          } else if (input$pieselect == "family") {
-            label <- ~ family
-          } else if (input$pieselect == "genus") {
-            label <- ~ genus
-          } else if (input$pieselect == "species") {
-            label <- ~ species
-          } else if (input$pieselect == "order") {
-            label <- ~ order
-          } else {
-            label <- ~ basisOfRecord
-          }
+          label <- switch(input$pieselect,
+                          "basisOfRecord" = ~basisOfRecord,
+                          "kingdom" = ~kingdom,
+                          "phylum" =  ~phylum,
+                          "phylum"  = ~phylum,
+                          "family" = ~family,
+                          "genus" = ~genus,
+                          "species" = ~species
+          )
           #Remove blank data from column(Blank! Not NA)
           if (!nrow(newData[-which(newData[, input$pieselect] == ""), ]) == 0) {
             newData <- newData[-which(newData[, input$pieselect] == ""), ]

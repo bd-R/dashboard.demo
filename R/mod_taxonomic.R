@@ -29,8 +29,14 @@ mod_taxonomic_ui <- function(id) {
           selectizeInput(
             ns("taxoBarInput"),
             "Select Taxonomic Level",
-            c("Kingdom", "Phylum", "Order", "Family", "Genus", "Species"),
-            selected = "Order"
+            c("Kingdom" = "1",
+              "Phylum" = "2",
+              "Order" = "3",
+              "Family" = "4",
+              "Genus" = "5",
+              "Species" = "6"
+            ),
+            selected = "3"
           )
         )
       ),
@@ -63,19 +69,14 @@ mod_taxonomic_ui <- function(id) {
 mod_taxonomic_server <- function(input, output, session, dataTaxo) {
   ns <- session$ns
   output$taxonomicBar <- renderPlotly({
-    if (input$taxoBarInput == "Kingdom") {
-      label <- ~ kingdom
-    } else if (input$taxoBarInput == "Phylum") {
-      label <- ~ phylum
-    } else if (input$taxoBarInput == "Family") {
-      label <- ~ family
-    } else if (input$taxoBarInput == "Genus") {
-      label <- ~ genus
-    } else if (input$taxoBarInput == "Species") {
-      label <- ~ species
-    } else{
-      label <- ~ order
-    }
+    label <- switch(as.integer(input$taxoBarInput),
+                    ~kingdom,
+                    ~phylum,
+                    ~order,
+                    ~family,
+                    ~genus,
+                    ~species
+                    )
     plot_ly(data = dataTaxo(),
             y = label,
             source = "taxoBar")
@@ -99,25 +100,20 @@ mod_taxonomic_server <- function(input, output, session, dataTaxo) {
         circlepackeR(population, size = "value")
       })
     } else {
-      if (input$taxoBarInput == "Kingdom") {
-        newData <- dataTaxo() %>%
-          filter(kingdom %in% select$y)
-      } else if (input$taxoBarInput == "Phylum") {
-        newData <- dataTaxo() %>% 
-          filter(phylum %in% select$y)
-      } else if (input$taxoBarInput == "Family") {
-        newData <- dataTaxo() %>% 
-          filter(family %in% select$y)
-      } else if (input$taxoBarInput == "Genus") {
-        newData <- dataTaxo() %>%
-          filter(genus %in% select$y)
-      } else if (input$taxoBarInput == "Species") {
-        newData <- dataTaxo() %>%
-          filter(species %in% select$y)
-      } else{
-        newData <- dataTaxo() %>%
-          filter(order %in% select$y)
-      }
+      newData <- switch(as.integer(input$taxoBarInput),
+                        dataTaxo() %>%
+                          filter(kingdom %in% select$y),
+                        dataTaxo() %>%
+                          filter(phylum %in% select$y),
+                        dataTaxo() %>%
+                          filter(order %in% select$y),
+                        dataTaxo() %>%
+                          filter(family %in% select$y),
+                        dataTaxo() %>%
+                          filter(genus %in% select$y),
+                        dataTaxo() %>%
+                          filter(species %in% select$y),
+                        )
       if (nrow(newData) == 0) {
         output$circleplot <- renderCirclepackeR({
           dataforCircle <- formatData(dataTaxo())

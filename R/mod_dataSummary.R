@@ -18,67 +18,145 @@ mod_dataSummary_ui <- function(id) {
   fluidPage(
     fluidRow(
       style = 'padding-bottom:0px;',
-      column(3, flexdashboard::gaugeOutput(ns("Gauge1"))),
-      column(3, flexdashboard::gaugeOutput(ns("Gauge2"))),
-      column(3, flexdashboard::gaugeOutput(ns("Gauge3"))),
-      column(3, flexdashboard::gaugeOutput(ns("Gauge4")))
+      column(
+        3,
+        flexdashboard::gaugeOutput(
+          ns("Gauge1")
+        )
+      ),
+      column(
+        3,
+        flexdashboard::gaugeOutput(
+          ns("Gauge2")
+        )
+      ),
+      column(
+        3,
+        flexdashboard::gaugeOutput(
+          ns("Gauge3")
+        )
+      ),
+      column(
+        3,
+        flexdashboard::gaugeOutput(
+          ns("Gauge4")
+        )
+      )
     ),
-    # fluidRow(column(12,plotOutput(ns("gauge"), height = "150px"))),br(),
     fluidRow(
       style = 'padding-top:-50px;',
-      column(4, shinydashboard::valueBoxOutput(ns("boxA"),
-                                               width = "100%")),
-      column(4, shinydashboard::valueBoxOutput(ns("boxB"),
-                                               width = "100%")),
-      column(4, shinydashboard::valueBoxOutput(ns("boxC"),
-                                               width = "100%"))
+      column(
+        4,
+        shinydashboard::valueBoxOutput(
+          ns("boxA"),
+          width = "100%"
+        )
+      ),
+      column(
+        4,
+        shinydashboard::valueBoxOutput(
+          ns("boxB"),
+          width = "100%"
+        )
+      ),
+      column(
+        4,
+        shinydashboard::valueBoxOutput(
+          ns("boxC"),
+          width = "100%"
+        )
+      )
     ),
-    fluidRow(style = 'padding-top:-50px;',
-             column(
-               12,
-               style = 'padding:20px;',
-               tabsetPanel(
-                 tabPanel("spatial", DT::dataTableOutput(ns("spatialTable"))),
-                 tabPanel("Temporal",
-                          fluidRow(
-                            column(
-                              3,
-                              style = "padding:20px",
-                              fluidRow(shinydashboard::valueBoxOutput(ns("yearstart"),
-                                                                      width = "40%")),
-                              fluidRow(shinydashboard::valueBoxOutput(ns("yearend"),
-                                                                      width = "40%"))
-                            ),
-                            column(9,
-                                   DT::dataTableOutput(ns("temporalTable")))
-                          )),
-                 tabPanel(
-                   "Taxonomic",
-                   fluidRow(
-                     column(4,
-                            shinydashboard::infoBoxOutput(ns("kingdom"),
-                                                          width = "100%")),
-                     column(4,
-                            shinydashboard::infoBoxOutput(ns("phylum"),
-                                                          width = "100%")),
-                     column(4,
-                            shinydashboard::infoBoxOutput(ns("order"),
-                                                          width = "100%"))
-                   ),
-                   fluidRow(
-                     column(4,
-                            shinydashboard::infoBoxOutput(ns("family"),
-                                                          width = "100%")),
-                     column(4,
-                            shinydashboard::infoBoxOutput(ns("genus"),
-                                                          width = "100%")),
-                     column(4,
-                            shinydashboard::infoBoxOutput(ns("species"),
-                                                          width = "100%"))
-                   )
-                 )
-               )
-             )#End of fluidRow
+    fluidRow(
+      style = 'padding-top:-50px;',
+      column(
+        12,
+        style = 'padding:20px;',
+        tabsetPanel(
+          tabPanel(
+            "spatial",
+            DT::dataTableOutput(
+              ns("spatialTable")
+            )
+          ),
+          tabPanel(
+            "Temporal",
+            fluidRow(
+              column(
+                3,
+                style = "padding:20px",
+                fluidRow(
+                  shinydashboard::valueBoxOutput(
+                    ns("yearstart"),
+                    width = "40%"
+                  )
+                ),
+                fluidRow(
+                  shinydashboard::valueBoxOutput(
+                    ns("yearend"),
+                    width = "40%"
+                  )
+                )
+              ),
+              column(
+                9,
+                DT::dataTableOutput(
+                  ns("temporalTable")
+                )
+              )
+            )
+          ),
+          tabPanel(
+            "Taxonomic",
+            fluidRow(
+              column(
+                4,
+                shinydashboard::infoBoxOutput(
+                  ns("kingdom"),
+                  width = "100%"
+                )
+              ),
+              column(
+                4,
+                shinydashboard::infoBoxOutput(
+                  ns("phylum"),
+                  width = "100%"
+                )
+              ),
+              column(
+                4,
+                shinydashboard::infoBoxOutput(
+                  ns("order"),
+                  width = "100%"
+                )
+              )
+            ),
+            fluidRow(
+              column(
+                4,
+                shinydashboard::infoBoxOutput(
+                  ns("family"),
+                  width = "100%"
+                )
+              ),
+              column(
+                4,
+                shinydashboard::infoBoxOutput(
+                  ns("genus"),
+                  width = "100%"
+                )
+              ),
+              column(
+                4,
+                shinydashboard::infoBoxOutput(
+                  ns("species"),
+                  width = "100%"
+                )
+              )
+            )
+          )
+        )
+      )
     )
   )#End of fluidPage
 }
@@ -440,14 +518,42 @@ mod_dataSummary_server <-
         if (length(which(!is.na(dataForBar$Date_collected))) == 0) {
           stop("Date_collected has no data")
         }
-        dayofYear <- as.numeric(strftime(as.Date(dataForBar$Date_collected, na.rm = T),
-                                         format = "%d"))
-        weekofYear <- as.numeric(strftime(as.Date(dataForBar$Date_collected, na.rm = T),
-                                          format = "%U"))
-        monthofYear <- as.numeric(strftime(as.Date(dataForBar$Date_collected, na.rm = T),
-                                           format = "%m"))
-        Year_ <- as.numeric(strftime(as.Date(dataForBar$Date_collected, na.rm = T),
-                                     format = "%Y"))
+        dayofYear <- as.numeric(
+          strftime(
+            as.Date(
+              dataForBar$Date_collected,
+              na.rm = T
+            ),
+            format = "%d"
+          )
+        )
+        weekofYear <- as.numeric(
+          strftime(
+            as.Date(
+              dataForBar$Date_collected,
+              na.rm = T
+            ),
+            format = "%U"
+          )
+        )
+        monthofYear <- as.numeric(
+          strftime(
+            as.Date(
+              dataForBar$Date_collected,
+              na.rm = T
+            ),
+            format = "%m"
+          )
+        )
+        Year_ = as.numeric(
+          strftime(
+            as.Date(
+              dataForBar$Date_collected,
+              na.rm = T
+            ),
+            format = "%Y"
+          )
+        )
         dataForBar <-
           cbind(dataForBar[c("basisOfRecord",
                              "kingdom",
@@ -470,16 +576,20 @@ mod_dataSummary_server <-
       dataForBar <- dataForBar[c(input$barselect, "Year_")]
       
       dataForBar <-
-        data.frame(table(dataForBar)) %>% dplyr::rename(group = input$barselect,
-                                                        variable = Year_,
-                                                        value = Freq)
+        data.frame(table(dataForBar)) %>%
+        dplyr::rename(
+          group = input$barselect,
+          variable = Year_,
+          value = Freq
+        )
       plot_ly(
         dataForBar,
         source = "barselected",
         x = ~ value,
         y = ~ variable,
         color = ~ group
-      ) %>%  layout(showlegend = FALSE, height = 250) %>%
+      ) %>%  
+        layout(showlegend = FALSE, height = 250) %>%
         add_bars()
       
       
