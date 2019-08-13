@@ -1,6 +1,18 @@
 #' @import shiny
 #' @import shinydashboard
+#' @import leaflet
+#' @import dplyr
 #' @import dashboardthemes
+#' @import ggpubr
+#' @import plotly
+#' @import circlepackeR
+#' @import data.tree
+#' @import flexdashboard
+#' @import bdvis
+#' @import ggplot2
+#' @import tidyr
+#' @import treemap
+#' @import sunburstR
 
 app_ui <- function() {
   dashboardPage(
@@ -53,7 +65,48 @@ app_ui <- function() {
       shinyDashboardThemes(theme = "grey_dark"),
       golem_add_external_resources(),
       tabItems(
-        
+        tabItem(tabName = "dataInputTab",
+                # -------------------------------
+                mod_dataInput_ui("dataInput_ui_1")
+                # -------------------------------
+        ),
+
+
+
+        tabItem(tabName = "dataSummary",
+                # -------------------------------
+                mod_dataSummary_ui("dataSummary_ui_1")
+                # -------------------------------
+        ),
+
+
+
+        tabItem(tabName = "spatialTab",
+                # -------------------------------
+
+                mod_spatial_ui("spatial_ui_1")
+
+                # -------------------------------
+        ),
+
+
+
+        tabItem(tabName = "taxonomicTab",
+                # -------------------------------
+
+                mod_taxonomic_ui("taxonomic_ui_1")
+
+                # -------------------------------
+        ),
+
+
+        tabItem(tabName = "temporalTab",
+                # -------------------------------
+
+                mod_temporal_ui("temporal_ui_1")
+
+                # -------------------------------
+        )
 
       )
     )#Dashboard Body ends here
@@ -69,8 +122,8 @@ golem_add_external_resources <- function() {
   addResourcePath('www', system.file('app/www', package = 'bdvisShiny'))
   
   tags$head(
-    golem::activate_js()
+    golem::activate_js(),
     #golem::favicon(),
-    #tags$link(rel = "stylesheet", type = "text/css", href = "www/custom.css")
+    tags$link(rel = "stylesheet", type = "text/css", href = "www/custom.css")
   )
 }

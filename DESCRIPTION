@@ -30,7 +30,20 @@ Imports:
     shiny,
     golem,
     shinydashboard,
-    dashboardthemes
+    dashboardthemes,
+    leaflet,
+    dplyr,
+    ggpubr,
+    plotly,
+    circlepackeR,
+    data.tree,
+    flexdashboard,
+    bdvis,
+    ggplot2,
+    tidyr,
+    sunburstR
 RoxygenNote: 6.1.1
 URL: https://github.com/rahulchauhan049/dashboard.demo
 BugReports: https://github.com/rahulchauhan049/dashboard.demo/issues
+Suggests: 
+    testthat (>= 2.1.0)
