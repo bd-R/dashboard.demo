@@ -1,0 +1,34 @@
+Package: dashboard.demo
+Title: Dashboard For biodiversity data visualization
+Version: 0.0.1
+Authors@R: c(
+    person(
+        "Rahul", "Chauhan",
+        email = "rahul.chauhan049@gmail.com",
+        role = c("aut","cre")),
+    person(
+        "Thiloshon", "Nagarajah",
+        email = "thiloshon@gmail.com",
+        role = c("aut")),
+    person(
+        "Tomer", "Gueta", 
+        email = "tomer.gu@gmail.com",
+        role = c("aut"),
+        comment = c(ORCID = '0000-0003-1557-8596')),
+    person(
+        "Vijay", "Barve", ,
+        email = "vijay.barve@gmail.com", 
+        role = c("aut"),
+        comment = c(ORCID = '0000-0002-4852-2567'))
+    )
+Maintainer: Rahul Chauhan <rahul.chauhan049@gmail.com>
+Description: Provide feature to visualization biodiversity data. This is a easy to use shiny dashboard which allow to visualize different aspect of biodiversity data such as temporal, taxonomic, spatial.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    shiny, 
+    golem
+RoxygenNote: 6.1.1
+URL: https://github.com/rahulchauhan049/dashboard.demo
+BugReports: https://github.com/rahulchauhan049/dashboard.demo/issues
