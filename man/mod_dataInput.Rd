@@ -3,7 +3,7 @@
 \name{mod_dataInput_ui}
 \alias{mod_dataInput_ui}
 \alias{mod_dataInput_server}
-\title{mod_dataInput_ui and mod_dataInput_server}
+\title{Module to select dataset for visualization}
 \usage{
 mod_dataInput_ui(id)
 
@@ -19,6 +19,6 @@ mod_dataInput_server(input, output, session, parentSession)
 \item{session}{internal}
 }
 \description{
-A shiny Module.
+Gives functioning to upload, download dataset for visualization. User can also choose existing datasets
 }
 \keyword{internal}

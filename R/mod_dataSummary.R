@@ -1,7 +1,7 @@
 # Module UI
 
-#' @title   mod_dataSummary_ui and mod_dataSummary_server
-#' @description  A shiny Module.
+#' @title   module for data summary
+#' @description  This shiny Module helps user to view the summary of data such as % of records missing.
 #'
 #' @param id shiny id
 #' @param input internal
@@ -48,21 +48,21 @@ mod_dataSummary_ui <- function(id) {
       column(
         4,
         shinydashboard::valueBoxOutput(
-          ns("boxA"),
+          ns("box_A"),
           width = "100%"
         )
       ),
       column(
         4,
         shinydashboard::valueBoxOutput(
-          ns("boxB"),
+          ns("box_B"),
           width = "100%"
         )
       ),
       column(
         4,
         shinydashboard::valueBoxOutput(
-          ns("boxC"),
+          ns("box_C"),
           width = "100%"
         )
       )
@@ -166,11 +166,9 @@ mod_dataSummary_ui <- function(id) {
 #' @rdname mod_dataSummary
 #' @export
 #' @keywords internal
-
 mod_dataSummary_server <-
-  function(input, output, session, dataset) {
+function(input, output, session, dataset) {
     ns <- session$ns
-    
     output$Gauge1 <- flexdashboard::renderGauge({
       df <- dataset()
       latitude <-
@@ -391,8 +389,7 @@ mod_dataSummary_server <-
       tableTemporal
     })
     
-    
-    output$boxA <-
+    output$box_A <-
       shinydashboard::renderValueBox({
         shinydashboard::valueBox(
           value = (nrow(dataset()["decimalLatitude"])),
@@ -402,7 +399,8 @@ mod_dataSummary_server <-
           width = 1
         )
       })
-    output$boxB <-
+    
+    output$box_B <-
       shinydashboard::renderValueBox({
         shinydashboard::valueBox(
           value = nrow(unique(dataset()["scientificName"])),
@@ -412,7 +410,8 @@ mod_dataSummary_server <-
           width = 1
         )
       })
-    output$boxC <-
+    
+    output$box_C <-
       shinydashboard::renderValueBox({
         shinydashboard::valueBox(
           value = length(dataset()),
@@ -454,6 +453,7 @@ mod_dataSummary_server <-
         width = 4
       )
     })
+    
     output$phylum <- shinydashboard::renderInfoBox({
       shinydashboard::infoBox(
         "# of Kingdom",
@@ -465,6 +465,7 @@ mod_dataSummary_server <-
         width = 4
       )
     })
+    
     output$order <- shinydashboard::renderInfoBox({
       shinydashboard::infoBox(
         "# of Kingdom",
@@ -488,6 +489,7 @@ mod_dataSummary_server <-
         width = 4
       )
     })
+    
     output$genus <- shinydashboard::renderInfoBox({
       shinydashboard::infoBox(
         "# of Kingdom",
@@ -499,6 +501,7 @@ mod_dataSummary_server <-
         width = 4
       )
     })
+    
     output$species <- shinydashboard::renderInfoBox({
       shinydashboard::infoBox("# of Kingdom",
                               nrow(unique(na.omit(dataset(
@@ -511,8 +514,6 @@ mod_dataSummary_server <-
     formattedData <- reactive({
       dataset <- dataset()
       dataForBar <- format_bdvis(dataset, source = 'rgbif')
-      
-      
       names(dataForBar) = gsub("\\.", "_", names(dataForBar))
       if ("Date_collected" %in% colnames(dataForBar)) {
         if (length(which(!is.na(dataForBar$Date_collected))) == 0) {
@@ -562,19 +563,16 @@ mod_dataSummary_server <-
                              "family",
                              "genus",
                              "species")], dayofYear, weekofYear, monthofYear, Year_)
-        
       } else {
         stop("Date_collected not found in data. Please use format_bdvis() to fix the problem")
       }
       return(dataForBar)
     })
     
-    
     output$bar <- renderPlotly({
       dataForBar <-
         arrange(formattedData(), as.numeric(formattedData()$Year_))
       dataForBar <- dataForBar[c(input$barselect, "Year_")]
-      
       dataForBar <-
         data.frame(table(dataForBar)) %>%
         dplyr::rename(
@@ -591,8 +589,6 @@ mod_dataSummary_server <-
       ) %>%  
         layout(showlegend = FALSE, height = 250) %>%
         add_bars()
-      
-      
     })
     output$totalCountry <-
       shinydashboard::renderValueBox({
@@ -629,7 +625,6 @@ mod_dataSummary_server <-
         type = "bar"
       ) %>%
         layout(showlegend = FALSE, height = 350)
-      
     })
     
     output$sunbrust <- renderSunburst({
@@ -654,16 +649,7 @@ mod_dataSummary_server <-
       temp <- temp %>%
         mutate(path = paste(phylum, order, family, genus, sep = "-")) %>%
         dplyr::select(path, Freq)
-      
       # Plot
       sunburst(temp, legend = FALSE)
     })
-    
-    
-    
   }
-## To be copied in the UI
-# mod_dataSummary_ui("dataSummary_ui_1")
-
-## To be copied in the server
-# callModule(mod_dataSummary_server, "dataSummary_ui_1")

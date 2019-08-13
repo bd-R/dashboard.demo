@@ -1,7 +1,7 @@
 # Module UI
 
-#' @title   mod_taxonomic_ui and mod_taxonomic_server
-#' @description  A shiny Module.
+#' @title   Module to visualize taxonomic data
+#' @description  Contain plots to visulaize taxonomic related data fields.
 #'
 #' @param id shiny id
 #' @param input internal
@@ -20,14 +20,14 @@ mod_taxonomic_ui <- function(id) {
       column(
         6,
         plotlyOutput(
-          ns("taxonomicBar"),
+          ns("taxonomic_bar"),
           height = "250px"
         ),
         absolutePanel(
           top = 10,
           right = 10,
           selectizeInput(
-            ns("taxoBarInput"),
+            ns("taxo_bar_input"),
             "Select Taxonomic Level",
             c("Kingdom" = "1",
               "Phylum" = "2",
@@ -66,10 +66,10 @@ mod_taxonomic_ui <- function(id) {
 #' @export
 #' @keywords internal
 
-mod_taxonomic_server <- function(input, output, session, dataTaxo) {
+mod_taxonomic_server <- function(input, output, session, data_taxo) {
   ns <- session$ns
-  output$taxonomicBar <- renderPlotly({
-    label <- switch(as.integer(input$taxoBarInput),
+  output$taxonomic_bar <- renderPlotly({
+    label <- switch(as.integer(input$taxo_bar_input),
                     ~kingdom,
                     ~phylum,
                     ~order,
@@ -77,7 +77,7 @@ mod_taxonomic_server <- function(input, output, session, dataTaxo) {
                     ~genus,
                     ~species
                     )
-    plot_ly(data = dataTaxo(),
+    plot_ly(data = data_taxo(),
             y = label,
             source = "taxoBar")
   })
@@ -86,7 +86,7 @@ mod_taxonomic_server <- function(input, output, session, dataTaxo) {
     select <- event_data("plotly_click", source = "taxoBar")
     if (is.null(select)) {
       output$circleplot <- renderCirclepackeR({
-        dataforCircle <- formatData(dataTaxo())
+        dataforCircle <- formatData(data_taxo())
         dataforCircle$pathString <-
           paste(
             "Vis",
@@ -100,23 +100,23 @@ mod_taxonomic_server <- function(input, output, session, dataTaxo) {
         circlepackeR(population, size = "value")
       })
     } else {
-      newData <- switch(as.integer(input$taxoBarInput),
-                        dataTaxo() %>%
+      newData <- switch(as.integer(input$taxo_bar_input),
+                        data_taxo() %>%
                           filter(kingdom %in% select$y),
-                        dataTaxo() %>%
+                        data_taxo() %>%
                           filter(phylum %in% select$y),
-                        dataTaxo() %>%
+                        data_taxo() %>%
                           filter(order %in% select$y),
-                        dataTaxo() %>%
+                        data_taxo() %>%
                           filter(family %in% select$y),
-                        dataTaxo() %>%
+                        data_taxo() %>%
                           filter(genus %in% select$y),
-                        dataTaxo() %>%
+                        data_taxo() %>%
                           filter(species %in% select$y),
                         )
       if (nrow(newData) == 0) {
         output$circleplot <- renderCirclepackeR({
-          dataforCircle <- formatData(dataTaxo())
+          dataforCircle <- formatData(data_taxo())
           dataforCircle$pathString <-
             paste(
               "Vis",
@@ -149,7 +149,7 @@ mod_taxonomic_server <- function(input, output, session, dataTaxo) {
   })
   
   output$sunbrust <- renderSunburst({
-    data <- dataTaxo()
+    data <- data_taxo()
     if (!nrow(data[-which(data[, "genus"] == ""), ]) == 0) {
       data <- data[-which(data[, "genus"] == ""), ]
     }
@@ -197,15 +197,6 @@ mod_taxonomic_server <- function(input, output, session, dataTaxo) {
     temp <- temp[c("phylum", "order", "family", "genus", "Freq")]
     colnames(temp) <-
       c("root", "group", "subgroup", "subsubgroup", "value")
-    
     return(temp)
   }
-  
-  
 }
-
-## To be copied in the UI
-# mod_taxonomic_ui("taxonomic_ui_1")
-
-## To be copied in the server
-# callModule(mod_taxonomic_server, "taxonomic_ui_1")

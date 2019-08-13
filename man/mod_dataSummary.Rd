@@ -3,7 +3,7 @@
 \name{mod_dataSummary_ui}
 \alias{mod_dataSummary_ui}
 \alias{mod_dataSummary_server}
-\title{mod_dataSummary_ui and mod_dataSummary_server}
+\title{module for data summary}
 \usage{
 mod_dataSummary_ui(id)
 
@@ -19,6 +19,6 @@ mod_dataSummary_server(input, output, session, dataset)
 \item{session}{internal}
 }
 \description{
-A shiny Module.
+This shiny Module helps user to view the summary of data such as % of records missing.
 }
 \keyword{internal}

@@ -1,7 +1,7 @@
 # Module UI
 
-#' @title   mod_spatial_ui and mod_spatial_server
-#' @description  A shiny Module.
+#' @title   Module for visualizing spatial data
+#' @description  This model is to visualize space related data such as latitude/longitude.
 #'
 #' @param id shiny id
 #' @param input internal
@@ -15,14 +15,14 @@
 #' @importFrom shiny NS tagList
 mod_spatial_ui <- function(id) {
   ns <- NS(id)
-  
+
   fluidPage(
     fluidRow(
       column(
         class = "noPadding",
         4,
         plotlyOutput(
-          ns("countryBar"),
+          ns("country_bar"),
           height = "360px"
         )
       ),
@@ -106,7 +106,6 @@ mod_spatial_ui <- function(id) {
 #' @rdname mod_spatial
 #' @export
 #' @keywords internal
-
 mod_spatial_server <- function(input, output, session, data) {
   ns <- session$ns
   formattedData <- reactive({
@@ -167,8 +166,7 @@ mod_spatial_server <- function(input, output, session, data) {
     return(dataForBar)
   })
   
-  
-  output$countryBar <- renderPlotly({
+  output$country_bar <- renderPlotly({
     country <-
       data.frame(table(na.omit(data()["countryCode"]))) %>%
       dplyr::rename(CountryName = Var1,
@@ -281,7 +279,6 @@ mod_spatial_server <- function(input, output, session, data) {
         if (!nrow(newData[-which(newData[, input$pieselect] == ""),]) == 0) {
           newData <- newData[-which(newData[, input$pieselect] == ""),]
         }
-        
         plot_ly(
           data = na.omit(newData[c("basisOfRecord",
                                    "kingdom",
@@ -497,8 +494,6 @@ mod_spatial_server <- function(input, output, session, data) {
             leagend = list(color = '#ffffff')
           )
       })
-      
-      
     }
   })
   
@@ -592,15 +587,6 @@ mod_spatial_server <- function(input, output, session, data) {
             leagend = list(color = '#ffffff')
           )
       })
-      
-      
     }
   })
 }
-
-
-## To be copied in the UI
-# mod_spatial_ui("spatial_ui_1")
-
-## To be copied in the server
-# callModule(mod_spatial_server, "spatial_ui_1")

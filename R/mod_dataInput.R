@@ -1,7 +1,7 @@
 # Module UI
 
-#' @title   mod_dataInput_ui and mod_dataInput_server
-#' @description  A shiny Module.
+#' @title   Module to select dataset for visualization
+#' @description  Gives functioning to upload, download dataset for visualization. User can also choose existing datasets
 #'
 #' @param id shiny id
 #' @param input internal
@@ -40,7 +40,7 @@ mod_dataInput_ui <- function(id) {
                 div(
                   class = "activeButton",
                   actionButton(
-                    ns("loadexisting"),
+                    ns("load_existing"),
                     "Load New Dataset",
                     icon("upload")
                   )
@@ -115,10 +115,10 @@ mod_dataInput_ui <- function(id) {
                   h3("Option 02: From Local Disk")
                 ),
                 div(
-                  id = ns("inputFileDiv"),
+                  id = ns("input_fileDiv"),
                   class = "activeButton",
                   fileInput(
-                    ns("inputFile"),
+                    ns("input_file"),
                     label = h3("CSV / DWCA ZIP file input"),
                     accept = c(
                       "text/csv",
@@ -210,7 +210,6 @@ mod_dataInput_ui <- function(id) {
 #' @rdname mod_dataInput
 #' @export
 #' @keywords internal
-
 mod_dataInput_server <-
   function(input, output, session, parentSession) {
     ns <- session$ns
@@ -227,7 +226,7 @@ mod_dataInput_server <-
     # ----------------
     #when user click on button called load existing dataset
     observeEvent(
-      input$loadexisting, {
+      input$load_existing, {
         returnData <<- switch(as.integer(input$dataSet),
                               mammals,
                               hyena,
@@ -286,7 +285,6 @@ mod_dataInput_server <-
               showNotification(paste(warnings, collapse = " "),
                                duration = 6)
             }
-            
             tempData <- data[[input$queryDB]]$data[[1]]
             returnData <<- tempData
           }
@@ -294,23 +292,22 @@ mod_dataInput_server <-
       dataLoadedTask(returnData)
     })
     
-    
     #Upload Dataset Function
-    observeEvent(input$inputFile, {
+    observeEvent(input$input_file, {
       withProgress(message = paste("Reading", 
-                                   input$inputFile$name, "..."), {
-                                     if (is.null(input$inputFile))
+                                   input$input_file$name, "..."), {
+                                     if (is.null(input$input_file))
                                        return("No data to view")
                                      
-                                     if (grepl("zip", tolower(input$inputFile$type))) {
+                                     if (grepl("zip", tolower(input$input_file$type))) {
                                        message("Reading DWCA ZIP...")
                                        finchRead <-
-                                         finch::dwca_read(input$inputFile$datapath, read = T)
+                                         finch::dwca_read(input$input_file$datapath, read = T)
                                        returnData <<- finchRead$data[[1]]
                                        
                                      } else {
                                        returnData <<-
-                                         data.table::fread(input$inputFile$datapath)
+                                         data.table::fread(input$input_file$datapath)
                                      }
                                    })
       dataLoadedTask(returnData)
@@ -345,16 +342,11 @@ mod_dataInput_server <-
         addProviderTiles(input$mapTexture) %>%
         setView(0, 0, zoom = 2)
     })
-    
-    
-    
-    
+
     #Draw Table
     output$inputDataTable <- DT::renderDataTable(DT::datatable({
       returnData
     }, options = list(scrollX = TRUE)))
-    
-    
     
     dataLoadedTask <- function(data) {
       if (length(data) == 0) {
@@ -362,7 +354,6 @@ mod_dataInput_server <-
                          duration = 2)
         return()
       }
-      
       
       if ("decimalLatitude" %in% colnames(returnData)) {
         returnData$decimalLatitude <<-
@@ -385,7 +376,6 @@ mod_dataInput_server <-
         returnData
       }, options = list(scrollX = TRUE)))
       
-      
       shinyjs::runjs(code = paste(
         '$("#',
         ns("queryDatabaseDiv"),
@@ -400,13 +390,13 @@ mod_dataInput_server <-
       ))
       shinyjs::runjs(code = paste(
         '$("#',
-        ns("inputFileDiv"),
+        ns("input_fileDiv"),
         '").addClass("readyButton");',
         sep = ""
       ))
       shinyjs::runjs(code = paste(
         '$("#',
-        ns("inputFileDiv"),
+        ns("input_fileDiv"),
         '").removeClass("activeButton");',
         sep = ""
       ))
@@ -427,8 +417,6 @@ mod_dataInput_server <-
         )
       )
       
-      
-      
       showNotification("Read Data Successfully", duration = 2)
       
       
@@ -440,19 +428,11 @@ mod_dataInput_server <-
     #Reactive function to change all plots when new dataset is selected
     returnDataReact <- reactive({
       # Input actions that need to trigger new dataframe return
-      input$loadexisting
-      input$inputFile
+      input$load_existing
+      input$input_file
       input$queryDatabase
       
       returnData
     })
-    
-    
     return(returnDataReact)
-  }
-
-## To be copied in the UI
-# mod_dataInput_ui("dataInput_ui_1")
-
-## To be copied in the server
-# callModule(mod_dataInput_server, "dataInput_ui_1")
+}

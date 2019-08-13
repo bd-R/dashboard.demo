@@ -3,11 +3,11 @@
 \name{mod_taxonomic_ui}
 \alias{mod_taxonomic_ui}
 \alias{mod_taxonomic_server}
-\title{mod_taxonomic_ui and mod_taxonomic_server}
+\title{Module to visualize taxonomic data}
 \usage{
 mod_taxonomic_ui(id)
 
-mod_taxonomic_server(input, output, session, dataTaxo)
+mod_taxonomic_server(input, output, session, data_taxo)
 }
 \arguments{
 \item{id}{shiny id}
@@ -19,6 +19,6 @@ mod_taxonomic_server(input, output, session, dataTaxo)
 \item{session}{internal}
 }
 \description{
-A shiny Module.
+Contain plots to visulaize taxonomic related data fields.
 }
 \keyword{internal}

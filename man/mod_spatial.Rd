@@ -3,7 +3,7 @@
 \name{mod_spatial_ui}
 \alias{mod_spatial_ui}
 \alias{mod_spatial_server}
-\title{mod_spatial_ui and mod_spatial_server}
+\title{Module for visualizing spatial data}
 \usage{
 mod_spatial_ui(id)
 
@@ -19,6 +19,6 @@ mod_spatial_server(input, output, session, data)
 \item{session}{internal}
 }
 \description{
-A shiny Module.
+This model is to visualize space related data such as latitude/longitude.
 }
 \keyword{internal}

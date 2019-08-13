@@ -3,11 +3,11 @@
 \name{mod_temporal_ui}
 \alias{mod_temporal_ui}
 \alias{mod_temporal_server}
-\title{mod_temporal_ui and mod_temporal_server}
+\title{Module to visualize temporal data}
 \usage{
 mod_temporal_ui(id)
 
-mod_temporal_server(input, output, session, dataTemporal)
+mod_temporal_server(input, output, session, data_temporal)
 }
 \arguments{
 \item{id}{shiny id}
@@ -19,6 +19,6 @@ mod_temporal_server(input, output, session, dataTemporal)
 \item{session}{internal}
 }
 \description{
-A shiny Module.
+This module is for visualization of time related data.
 }
 \keyword{internal}

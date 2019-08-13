@@ -1,7 +1,7 @@
 # Module UI
 
-#' @title   mod_temporal_ui and mod_temporal_server
-#' @description  A shiny Module.
+#' @title   Module to visualize temporal data
+#' @description  This module is for visualization of time related data.
 #'
 #' @param id shiny id
 #' @param input internal
@@ -28,7 +28,7 @@ mod_temporal_ui <- function(id) {
           top = 10,
           left = 20,
           selectInput(
-            ns("barselect"),
+            ns("bar_select"),
             "Select Column to be displayed",
             c(
               "basisOfRecord",
@@ -86,14 +86,11 @@ mod_temporal_ui <- function(id) {
 #' @rdname mod_temporal
 #' @export
 #' @keywords internal
-
 mod_temporal_server <-
-  function(input, output, session, dataTemporal) {
+  function(input, output, session, data_temporal) {
     ns <- session$ns
     formattedData <- reactive({
-      dataForBar <- format_bdvis(dataTemporal(), source = 'rgbif')
-      
-      
+      dataForBar <- format_bdvis(data_temporal(), source = 'rgbif')
       names(dataForBar) = gsub("\\.", "_", names(dataForBar))
       if ("Date_collected" %in% colnames(dataForBar)) {
         if (length(which(!is.na(dataForBar$Date_collected))) == 0) {
@@ -143,7 +140,6 @@ mod_temporal_server <-
                              "family",
                              "genus",
                              "species")], dayofYear, weekofYear, monthofYear, Year_)
-        
       } else {
         stop("Date_collected not found in data. Please use format_bdvis() to fix the problem")
       }
@@ -154,16 +150,15 @@ mod_temporal_server <-
     output$bar <- renderPlotly({
       dataForBar <-
         arrange(formattedData(), as.numeric(formattedData()$Year_))
-      dataForBar <- dataForBar[c(input$barselect, "Year_")]
-      
+      dataForBar <- dataForBar[c(input$bar_select, "Year_")]
       dataForBar <-
         data.frame(table(dataForBar)) %>% 
-        rename(group = input$barselect,
+        rename(group = input$bar_select,
                variable = Year_,
                value = Freq)
       plot_ly(
         dataForBar,
-        source = "barselected",
+        source = "bar_selected",
         x = ~ variable,
         y = ~ value,
         color = ~ group
@@ -180,7 +175,7 @@ mod_temporal_server <-
     })
     
     observe({
-      select <- event_data("plotly_click", source = "barselected")
+      select <- event_data("plotly_click", source = "bar_selected")
       if (is.null(select)) {
         output$pie <- renderPlotly({
           label <- switch(input$pieselect,
@@ -192,11 +187,11 @@ mod_temporal_server <-
                           "genus" = ~genus,
                           "species" = ~species
           )
-          if (!nrow(dataTemporal()[-which(dataTemporal()[, input$pieselect] == ""), ]) == 0) {
+          if (!nrow(data_temporal()[-which(data_temporal()[, input$pieselect] == ""), ]) == 0) {
             dataa <-
-              dataTemporal()[-which(dataTemporal()[, input$pieselect] == ""), ]
+              data_temporal()[-which(data_temporal()[, input$pieselect] == ""), ]
           } else {
-            dataa <- dataTemporal()
+            dataa <- data_temporal()
           }
           
           plot_ly(
@@ -226,7 +221,7 @@ mod_temporal_server <-
       } else {
         #create new dataset based on where user clicked on bar graph
         newData <-
-          dataTemporal() %>%
+          data_temporal() %>%
           filter(year %in% as.numeric(select))
         output$pie <- renderPlotly({
           label <- switch(input$pieselect,
@@ -242,7 +237,6 @@ mod_temporal_server <-
           if (!nrow(newData[-which(newData[, input$pieselect] == ""), ]) == 0) {
             newData <- newData[-which(newData[, input$pieselect] == ""), ]
           }
-          
           plot_ly(
             data = na.omit(newData[c("basisOfRecord",
                                      "kingdom",
@@ -273,7 +267,7 @@ mod_temporal_server <-
     
     #redraw roseplot when any change made in barplot
     observe({
-      select <- event_data("plotly_click", source = "barselected")
+      select <- event_data("plotly_click", source = "bar_selected")
       if (is.null(select)) {
         output$roseplot <- renderPlot({
           dataForRose <-
@@ -311,7 +305,6 @@ mod_temporal_server <-
               legend.key = element_rect(color = "gray", fill = "black"),
               legend.title = element_text(color = "white"),
               legend.text = element_text(color = "white")
-              
             )
         },  bg = "transparent")
       } else {
@@ -360,9 +353,3 @@ mod_temporal_server <-
       }
     })
   }
-
-## To be copied in the UI
-# mod_temporal_ui("temporal_ui_1")
-
-## To be copied in the server
-# callModule(mod_temporal_server, "temporal_ui_1")

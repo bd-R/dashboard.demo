@@ -13,13 +13,10 @@
 #' @import tidyr
 #' @import treemap
 #' @import sunburstR
-
 app_ui <- function() {
   dashboardPage(
     skin = "green",
     dashboardHeader(title = "bdvisashboard"),
-    
-    
     #----------------------SideBar Start-------------------------------------
     dashboardSidebar(
       sidebarMenu(
@@ -29,25 +26,21 @@ app_ui <- function() {
           tabName = "dataInputTab",
           icon = icon("database")
         ),
-        
         menuItem(
           "Data Summary",
           tabName = "dataSummary",
           icon = icon("database")
         ),
-        
         menuItem(
           "Spatial Visualization",
           tabName = "spatialTab",
           icon = icon("map-marked")
         ),
-        
         menuItem(
           "Taxonomic Visualization",
           tabName = "taxonomicTab",
           icon = icon("connectdevelop")
         ),
-        
         menuItem(
           "Temporal Visualization",
           tabName = "temporalTab",
@@ -58,61 +51,46 @@ app_ui <- function() {
     #sidebar Dashboard ends here
     #----------------------SideBar End-------------------------------------
     
-    
-    
     #----------------------Body Start-------------------------------------
     dashboardBody(
       shinyDashboardThemes(theme = "grey_dark"),
       golem_add_external_resources(),
       tabItems(
+        
         tabItem(tabName = "dataInputTab",
                 # -------------------------------
-                mod_dataInput_ui("dataInput_ui_1")
+                mod_dataInput_ui("dataInput_ui")
                 # -------------------------------
         ),
-
-
-
         tabItem(tabName = "dataSummary",
                 # -------------------------------
-                mod_dataSummary_ui("dataSummary_ui_1")
+                mod_dataSummary_ui("dataSummary_ui")
                 # -------------------------------
         ),
-
-
-
         tabItem(tabName = "spatialTab",
                 # -------------------------------
 
-                mod_spatial_ui("spatial_ui_1")
+                mod_spatial_ui("spatial_ui")
 
                 # -------------------------------
         ),
-
-
-
         tabItem(tabName = "taxonomicTab",
                 # -------------------------------
 
-                mod_taxonomic_ui("taxonomic_ui_1")
+                mod_taxonomic_ui("taxonomic_ui")
 
                 # -------------------------------
         ),
-
-
         tabItem(tabName = "temporalTab",
                 # -------------------------------
 
-                mod_temporal_ui("temporal_ui_1")
+                mod_temporal_ui("temporal_ui")
 
                 # -------------------------------
         )
-
       )
     )#Dashboard Body ends here
-    
     #-------------------------Body Ends Here-------------------------------
-    
   )#End of dashboard page
 }
 

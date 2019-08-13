@@ -7,10 +7,6 @@ Authors@R: c(
         email = "rahul.chauhan049@gmail.com",
         role = c("aut","cre")),
     person(
-        "Thiloshon", "Nagarajah",
-        email = "thiloshon@gmail.com",
-        role = c("aut")),
-    person(
         "Tomer", "Gueta", 
         email = "tomer.gu@gmail.com",
         role = c("aut"),
@@ -19,7 +15,11 @@ Authors@R: c(
         "Vijay", "Barve", ,
         email = "vijay.barve@gmail.com", 
         role = c("aut"),
-        comment = c(ORCID = '0000-0002-4852-2567'))
+        comment = c(ORCID = '0000-0002-4852-2567')),
+    person(
+        "Thiloshon", "Nagarajah",
+        email = "thiloshon@gmail.com",
+        role = c("aut"))
     )
 Maintainer: Rahul Chauhan <rahul.chauhan049@gmail.com>
 Description: Provide feature to visualization biodiversity data. This is a easy to use shiny dashboard which allow to visualize different aspect of biodiversity data such as temporal, taxonomic, spatial.
