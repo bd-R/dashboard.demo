@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# bdvisDashboard
+# dashboard.demo
 
 <!-- badges: start -->
 
@@ -9,39 +9,39 @@
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 <!-- badges: end -->
 
-The goal of bdvisDashboard is to provide an interactive shiny package
+The goal of dashboard.demo is to provide an interactive shiny package
 that allows user to visualize different aspect of bioDiversity data such
 as temporal, taxonomic and spatial without worring about coding. This
 package provides feature to upload and download datasets, a special tab
 dedicated to view summary of data. User can also use pre-existing
-datasets to get familiarize with bdvisDashboard without worring about
+datasets to get familiarize with dashboard.demo without worring about
 data. Each tab is dedicated to different field of visualization for easy
 navigation.
 
 ## Installation
 
-You can install the development version of bdvisDashboard from
+You can install the development version of dashboard.demo from
 [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("rahulchauhan049/bdvisDashboard")
+devtools::install_github("rahulchauhan049/dashboard.demo")
 ```
 
 ``` r
-library("bdvisDashboard)
+library("dashboard.demo)
 ```
 
-## Using bdvisDashboard
+## Using dashboard.demo
 
-Follow these steps to run bdvisDashboard
+Follow these steps to run dashboard.demo
 
 ``` r
-bdvisDashboard::run_app()
-## Run the code to open bdvisDashboard
+dashboard.demo::run_app()
+## Run the code to open dashboard.demo
 ```
 
-## bdvisDashboard Overview
+## dashboard.demo Overview
 
 ### DataInput Tab
 
@@ -91,6 +91,6 @@ selection box.
 
 ## We need your feedback :innocent:
 
-Please submit your feedback using this **[link](https://github.com/rahulchauhan049/bdvisDashboard/issues/new)**
+Please submit your feedback using this **[link](https://github.com/rahulchauhan049/dashboard.demo/issues/new)**
 
    :deciduous_tree: :mushroom: :shell: :fish: :frog: :honeybee: :turtle: :rooster: :whale2: :monkey: :octocat: 
