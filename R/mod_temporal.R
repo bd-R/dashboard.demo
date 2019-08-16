@@ -19,62 +19,64 @@ mod_temporal_ui <- function(id) {
     class = "darkbg",
     fluidRow(
       column(
-        12,
-        plotlyOutput(
-          ns("bar"),
-          height = "250px"
+        6,
+        selectInput(
+          ns("bar_select"),
+          "Select Column to be displayed",
+          c(
+            "basisOfRecord",
+            "kingdom",
+            "phylum",
+            "order",
+            "family",
+            "genus",
+            "species"
+          ),
+          selected = "basisOfRecord"
         ),
-        absolutePanel(
-          top = 10,
-          left = 20,
-          selectInput(
-            ns("bar_select"),
-            "Select Column to be displayed",
-            c(
-              "basisOfRecord",
-              "kingdom",
-              "phylum",
-              "order",
-              "family",
-              "genus",
-              "species"
-            ),
-            selected = "basisOfRecord"
-          )
+        plotlyOutput(
+          ns("bar")
         )
+      ),
+      column(
+        6,
+        class = "noPadding",
+        selectInput(
+          ns("violin_select"),
+          "Select Column to be displayed",
+          c(
+            "year",
+            "day",
+            "month"
+          ),
+          selected = "year"
+        ),
+        plotlyOutput(
+          ns("violin")
+        ),
+        verbatimTextOutput(ns("a"))
       )
     ),
     fluidRow(
       column(
         6,
         class = "noPadding",
-        plotOutput(
-          ns("roseplot")
-        )
-      ),
-      column(
-        6,
-        class = "noPadding",
+        selectInput(
+          ns("pieselect"),
+          "Select Column to be displayed",
+          c(
+            "basisOfRecord",
+            "kingdom",
+            "phylum",
+            "order",
+            "family",
+            "genus",
+            "species"
+          ),
+          selected = "basisOfRecord"
+        ),
         plotlyOutput(
           ns("pie")
-        ),
-        absolutePanel(
-          top = 10,
-          left = 20,
-          selectInput(
-            ns("pieselect"),
-            "Select Column to be displayed",
-            c(
-              "basisOfRecord",
-              "kingdom",
-              "phylum",
-              "order",
-              "family",
-              "genus",
-              "species"
-            ),
-            selected = "basisOfRecord"
-          )
         )
       )
     )
@@ -148,91 +150,149 @@ mod_temporal_server <-
     
     #Plot bar graph
     output$bar <- renderPlotly({
-      dataForBar <-
-        arrange(formattedData(), as.numeric(formattedData()$Year_))
-      dataForBar <- dataForBar[c(input$bar_select, "Year_")]
-      dataForBar <-
-        data.frame(table(dataForBar)) %>% 
-        rename(group = input$bar_select,
-               variable = Year_,
-               value = Freq)
-      plot_ly(
-        dataForBar,
-        source = "bar_selected",
-        x = ~ variable,
-        y = ~ value,
-        color = ~ group
-      ) %>%
-        add_bars() %>%
-        layout(
-          barmode = 'stack',
-          paper_bgcolor = '#000000',
-          plot_bgcolor = '#000000',
-          xaxis = list(color = '#ffffff'),
-          yaxis = list(color = '#ffffff'),
-          leagend = list(color = '#ffffff')
+      label <- switch(input$bar_select,
+                      "basisOfRecord" = ~basisOfRecord,
+                      "kingdom" = ~kingdom,
+                      "phylum" =  ~phylum,
+                      "order"  = ~order,
+                      "family" = ~family,
+                      "genus" = ~genus,
+                      "species" = ~species
+      )
+        plot_ly(data = data_temporal(),
+                x = label,
+                source = "bar_selected") %>%
+          layout(
+                showlegend = FALSE,
+                paper_bgcolor = '#000000',
+                plot_bgcolor = '#000000',
+                xaxis = list(color = '#ffffff'),
+                yaxis = list(color = '#ffffff'),
+                leagend = list(color = '#ffffff')
         )
     })
-    
-    observe({
+
+    #Violin Plot
+    output$violin <- renderPlotly({
+      df <- data_temporal()
       select <- event_data("plotly_click", source = "bar_selected")
-      if (is.null(select)) {
-        output$pie <- renderPlotly({
-          label <- switch(input$pieselect,
+      if(is.null(select)){
+        df %>%
+          plot_ly(
+            y = switch(input$violin_select,
+                       "year" = ~year,
+                       "month" = ~month,
+                       "day" =  ~day
+            ),
+            type = 'violin',
+            box = list(
+              visible = T
+            ),
+            meanline = list(
+              visible = T
+            ),
+            x0 = input$violin_select
+          ) %>% 
+          layout(
+            yaxis = list(
+              title = "",
+              zeroline = F
+            )
+          )
+        }else {
+          newData <- data_temporal() %>%
+            filter(switch(input$bar_select,
+                          "basisOfRecord" = basisOfRecord,
+                          "kingdom" = kingdom,
+                          "phylum" =  phylum,
+                          "order"  = order,
+                          "family" = family,
+                          "genus" = genus,
+                          "species" = species
+            ) %in% select$x)
+          if(nrow(newData) == 0){
+            newData <- df
+          }
+    newData %>%
+      plot_ly(
+        y = switch(input$violin_select,
+                   "year" = ~year,
+                   "month" = ~month,
+                   "day" =  ~day
+        ),
+        type = 'violin',
+        box = list(
+          visible = T
+        ),
+        meanline = list(
+          visible = T
+        ),
+        x0 = input$violin_select
+      ) %>% 
+      layout(
+        yaxis = list(
+          title = "",
+          zeroline = F
+        )
+      )
+    }
+  })
+    
+    output$pie <- renderPlotly({
+      select <- event_data("plotly_click", source = "bar_selected")
+      if (!nrow(data_temporal()[-which(data_temporal()[, input$pieselect] == ""), ]) == 0) {
+        dataa <-
+          data_temporal()[-which(data_temporal()[, input$pieselect] == ""), ]
+      } else {
+        dataa <- data_temporal()
+      }
+      if(is.null(select)){
+        plot_ly(
+          data = na.omit(dataa[c("basisOfRecord",
+                                 "kingdom",
+                                 "phylum",
+                                 "order",
+                                 "family",
+                                 "genus",
+                                 "species")]),
+          labels = switch(input$pieselect,
                           "basisOfRecord" = ~basisOfRecord,
                           "kingdom" = ~kingdom,
                           "phylum" =  ~phylum,
-                          "phylum"  = ~phylum,
+                          "order"  = ~order,
                           "family" = ~family,
                           "genus" = ~genus,
                           "species" = ~species
+          ),
+          type = 'pie',
+          textposition = 'inside',
+          textinfo = 'label+percent',
+          insidetextfont = list(color = '#FFFFFF'),
+          hoverinfo = 'text'
+        ) %>%
+          layout(
+            showlegend = FALSE,
+            paper_bgcolor = '#000000',
+            plot_bgcolor = '#000000',
+            xaxis = list(color = '#ffffff'),
+            yaxis = list(color = '#ffffff'),
+            leagend = list(color = '#ffffff')
           )
-          if (!nrow(data_temporal()[-which(data_temporal()[, input$pieselect] == ""), ]) == 0) {
-            dataa <-
-              data_temporal()[-which(data_temporal()[, input$pieselect] == ""), ]
-          } else {
-            dataa <- data_temporal()
-          }
-          
-          plot_ly(
-            data = na.omit(dataa[c("basisOfRecord",
-                                   "kingdom",
-                                   "phylum",
-                                   "order",
-                                   "family",
-                                   "genus",
-                                   "species")]),
-            labels = label,
-            type = 'pie',
-            textposition = 'inside',
-            textinfo = 'label+percent',
-            insidetextfont = list(color = '#FFFFFF'),
-            hoverinfo = 'text'
-          ) %>% 
-            layout(
-              showlegend = FALSE,
-              paper_bgcolor = '#000000',
-              plot_bgcolor = '#000000',
-              xaxis = list(color = '#ffffff'),
-              yaxis = list(color = '#ffffff'),
-              leagend = list(color = '#ffffff')
-            )
-        })
       } else {
-        #create new dataset based on where user clicked on bar graph
         newData <-
           data_temporal() %>%
-          filter(year %in% as.numeric(select))
-        output$pie <- renderPlotly({
-          label <- switch(input$pieselect,
-                          "basisOfRecord" = ~basisOfRecord,
-                          "kingdom" = ~kingdom,
-                          "phylum" =  ~phylum,
-                          "phylum"  = ~phylum,
-                          "family" = ~family,
-                          "genus" = ~genus,
-                          "species" = ~species
-          )
+          filter(switch(input$bar_select,
+                        "basisOfRecord" = basisOfRecord,
+                        "kingdom" = kingdom,
+                        "phylum" =  phylum,
+                        "order"  = order,
+                        "family" = family,
+                        "genus" = genus,
+                        "species" = species
+          ) %in% select$x)
+        if(nrow(newData)==0){
+          newData = dataa
+        }
           #Remove blank data from column(Blank! Not NA)
           if (!nrow(newData[-which(newData[, input$pieselect] == ""), ]) == 0) {
             newData <- newData[-which(newData[, input$pieselect] == ""), ]
@@ -245,7 +305,15 @@ mod_temporal_server <-
                                      "family",
                                      "genus",
                                      "species")]),
-            labels = label,
+            labels = switch(input$pieselect,
+                            "basisOfRecord" = ~basisOfRecord,
+                            "kingdom" = ~kingdom,
+                            "phylum" =  ~phylum,
+                            "phylum"  = ~phylum,
+                            "family" = ~family,
+                            "genus" = ~genus,
+                            "species" = ~species
+            ),
             type = 'pie',
             textposition = 'inside',
             textinfo = 'label+percent',
@@ -260,11 +328,11 @@ mod_temporal_server <-
               yaxis = list(color = '#ffffff'),
               leagend = list(color = '#ffffff')
             )
-        })
       }
       
     })
-    
+  
+
     #redraw roseplot when any change made in barplot
     observe({
       select <- event_data("plotly_click", source = "bar_selected")
@@ -280,7 +348,7 @@ mod_temporal_server <-
               dataForRose[-which(dataForRose[, "basisOfRecord"] == ""), ]
           }
           dataForRose <-
-            data.frame(table(dataForRose)) %>% 
+            data.frame(table(dataForRose)) %>%
             rename(group = basisOfRecord,
                    variable = monthofYear,
                    value = Freq
@@ -310,7 +378,7 @@ mod_temporal_server <-
       } else {
         output$roseplot <- renderPlot({
           dataForRose <-
-            formattedData() %>% 
+            formattedData() %>%
             filter(Year_ %in% as.numeric(select))
           dataForRose <-
             arrange(dataForRose, as.numeric(dataForRose$monthofYear))
@@ -347,7 +415,7 @@ mod_temporal_server <-
               legend.key = element_rect(color = "gray", fill = "black"),
               legend.title = element_text(color = "white"),
               legend.text = element_text(color = "white")
-              
+
             )
         })
       }
