@@ -13,6 +13,8 @@
 #' @import tidyr
 #' @import treemap
 #' @import sunburstR
+#' @import formattable
+#' @import summarytools
 app_ui <- function() {
   dashboardPage(
     skin = "green",
@@ -27,9 +29,16 @@ app_ui <- function() {
           icon = icon("database")
         ),
         menuItem(
-          "Data Summary",
-          tabName = "dataSummary",
-          icon = icon("database")
+          "Data Overview",
+          icon = icon("database"),
+          menuSubItem(
+            "Data Summary",
+            tabName = "dataSummary"
+          ),
+          menuSubItem(
+            "Missing Data Overview",
+            tabName = "missing_overview"
+          )
         ),
         menuItem(
           "Spatial Visualization",
@@ -66,6 +75,12 @@ app_ui <- function() {
                 # -------------------------------
                 mod_dataSummary_ui("dataSummary_ui")
                 # -------------------------------
+                ),
+        tabItem(tabName = "missing_overview",
+                #--------------------------------
+                mod_missing_data_ui("missing_data_ui")
+                #--------------------------------
+                
         ),
         tabItem(tabName = "spatialTab",
                 # -------------------------------

@@ -8,6 +8,8 @@ app_server <- function(input, output, session) {
   
   callModule(mod_dataSummary_server, "dataSummary_ui", inputDataset)
   
+  callModule(mod_missing_data_server, "missing_data_ui", inputDataset)
+  
   callModule(mod_spatial_server, "spatial_ui", inputDataset)
   
   callModule(mod_taxonomic_server, "taxonomic_ui", inputDataset)

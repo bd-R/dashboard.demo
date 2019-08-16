@@ -75,7 +75,7 @@ mod_dataSummary_ui <- function(id) {
         tabsetPanel(
           tabPanel(
             "spatial",
-            DT::dataTableOutput(
+            formattable::formattableOutput(
               ns("spatialTable")
             )
           ),
@@ -100,7 +100,7 @@ mod_dataSummary_ui <- function(id) {
               ),
               column(
                 9,
-                DT::dataTableOutput(
+                formattable::formattableOutput(
                   ns("temporalTable")
                 )
               )
@@ -258,7 +258,7 @@ function(input, output, session, dataset) {
       )
     })
     
-    output$spatialTable <- DT::renderDataTable({
+    output$spatialTable <- formattable::renderFormattable({
       df <- dataset()
       names <-
         c(
@@ -287,48 +287,48 @@ function(input, output, session, dataset) {
           sum(is.na(df["locality"])))
       RecordsPercentage <-
         c(
-          paste0(round((
+          round((
             (nrow(df["decimalLatitude"]) - sum(is.na(df["decimalLatitude"]))) /
               nrow(df["decimalLatitude"])
-          ), 2) * 100, "%"),
-          
-          paste0(round((
+          ), 2) * 100,
+          round((
             (nrow(df["decimalLongitude"]) -
                sum(is.na(df["decimalLongitude"]))) /
               nrow(df["decimalLongitude"])
           ), 2) * 100,
-          "%"),
-          
-          paste0(round((
+          round((
             (nrow(df["coordinateUncertaintyInMeters"]) -
                sum(is.na(df["coordinateUncertaintyInMeters"]))) /
               nrow(df["coordinateUncertaintyInMeters"])
           ), 2) * 100,
-          "%"),
-          paste0(round((
+          round((
             (nrow(df["coordinatePrecision"]) -
                sum(is.na(df["coordinatePrecision"]))) /
               nrow(df["coordinatePrecision"])
           ), 2) * 100,
-          "%"),
-          paste0(round((
+          round((
             (nrow(df["countryCode"]) - sum(is.na(df["countryCode"]))) /
               nrow(df["countryCode"])
           ), 2) * 100,
-          "%"),
-          paste0(round((
+          round((
             (nrow(df["locality"]) - sum(is.na(df["locality"]))) /
               nrow(df["locality"])
-          ), 2) * 100,
-          "%")
+          ), 2) * 100
         )
       
       table <-
         data.frame(names, TotalRecords, MissingRecords, RecordsPercentage)
-      table
+      customRed <- "#ff7f7f"
+      unit.scale = function(x) (x - min(x)) / (max(x) - min(x))
+      formattable::formattable(table,  align = c("l",rep("r", NCOL(table) - 1)),
+                                list(
+                                  RecordsPercentage = color_bar(customRed, 
+                                                                fun = unit.scale)
+                                )
+                              )
     })
     
-    output$temporalTable <- DT::renderDataTable({
+    output$temporalTable <- formattable::renderFormattable({
       df <- dataset()
       names <- c("eventDate",
                  "day",
@@ -354,39 +354,43 @@ function(input, output, session, dataset) {
           sum(is.na(df["lastInterpreted"])))
       RecordsPercentage <-
         c(
-          paste0(round((
+          round((
             (nrow(df["eventDate"]) - sum(is.na(df["eventDate"]))) /
               nrow(df["eventDate"])
           ), 2) * 100,
-          "%"),
-          paste0(round((
+          round((
             (nrow(df["day"]) - sum(is.na(df["day"]))) /
               nrow(df["day"])
           ), 2) * 100,
-          "%"),
-          paste0(round((
+          round((
             (nrow(df["month"]) - sum(is.na(df["month"]))) /
               nrow(df["month"])
           ), 2) * 100,
-          "%"),
-          paste0(round((
+          round((
             (nrow(df["year"]) - sum(is.na(df["year"]))) /
               nrow(df["year"])
-          ), 2) * 100, "%"),
-          paste0(round((
+          ), 2) * 100,
+          round((
             (nrow(df["dateIdentified"]) - sum(is.na(df["dateIdentified"]))) /
               nrow(df["dateIdentified"])
           ), 2) * 100,
-          "%"),
-          paste0(round((
+          round((
             (nrow(df["lastInterpreted"]) - sum(is.na(df["lastInterpreted"]))) /
               nrow(df["lastInterpreted"])
-          ), 2) * 100, "%")
+          ), 2) * 100
         )
       
       tableTemporal <-
         data.frame(names, TotalRecords, MissingRecords, RecordsPercentage)
-      tableTemporal
+      customRed <- "#ff7f7f"
+      unit.scale = function(x) (x - min(x)) / (max(x) - min(x))
+      formattable::formattable(tableTemporal,
+                               align = c("l",rep("r", NCOL(table) - 1)),
+                               list(
+                                 RecordsPercentage = color_bar(customRed, 
+                                                               fun = unit.scale)
+                               )
+                               )
     })
     
     output$box_A <-
@@ -406,7 +410,7 @@ function(input, output, session, dataset) {
           value = nrow(unique(dataset()["scientificName"])),
           subtitle = "# of Taxa",
           icon = icon("file-signature"),
-          color = "aqua",
+          color = "blue",
           width = 1
         )
       })
@@ -417,7 +421,7 @@ function(input, output, session, dataset) {
           value = length(dataset()),
           subtitle = "# of Attributes",
           icon = icon("area-chart"),
-          color = "aqua",
+          color = "light-blue",
           width = 1
         )
       })
@@ -427,7 +431,7 @@ function(input, output, session, dataset) {
         value = min(na.omit(formattedData()["Year_"])),
         subtitle = "Starting Year",
         icon = icon("clock"),
-        color = "aqua",
+        color = "green",
         width = 1
       )
     })
@@ -437,7 +441,7 @@ function(input, output, session, dataset) {
         value = max(na.omit(formattedData()["Year_"])),
         subtitle = "ENd Year",
         icon = icon("clock"),
-        color = "aqua",
+        color = "olive",
         width = 1
       )
     })
@@ -449,66 +453,67 @@ function(input, output, session, dataset) {
           
         )["kingdom"]))),
         icon = icon("clock"),
-        color = "aqua",
+        color = "red",
         width = 4
       )
     })
     
     output$phylum <- shinydashboard::renderInfoBox({
       shinydashboard::infoBox(
-        "# of Kingdom",
+        "# of Phylum",
         nrow(unique(na.omit(dataset(
           
         )["phylum"]))),
-        icon = icon("clock"),
-        color = "aqua",
+        icon = icon("product-hunt"),
+        color = "orange",
         width = 4
       )
     })
     
     output$order <- shinydashboard::renderInfoBox({
       shinydashboard::infoBox(
-        "# of Kingdom",
+        "# of Order",
         nrow(unique(na.omit(dataset(
           
         )["order"]))),
-        icon = icon("clock"),
-        color = "aqua",
+        icon = icon("opera"),
+        color = "green",
         width = 4
       )
     })
     
     output$family <- shinydashboard::renderInfoBox({
       shinydashboard::infoBox(
-        "# of Kingdom",
+        "# of Family",
         nrow(unique(na.omit(dataset(
           
         )["family"]))),
-        icon = icon("clock"),
-        color = "aqua",
+        icon = icon("facebook-f"),
+        color = "navy",
         width = 4
       )
     })
     
     output$genus <- shinydashboard::renderInfoBox({
       shinydashboard::infoBox(
-        "# of Kingdom",
+        "# of Genus",
         nrow(unique(na.omit(dataset(
           
         )["genus"]))),
-        icon = icon("clock"),
-        color = "aqua",
+        icon = icon("gofore"),
+        color = "yellow",
         width = 4
       )
     })
     
     output$species <- shinydashboard::renderInfoBox({
-      shinydashboard::infoBox("# of Kingdom",
-                              nrow(unique(na.omit(dataset(
-                                
-                              )["species"]))),
-                              color = "aqua",
-                              width = 4)
+      shinydashboard::infoBox(
+        "# of Species",
+        nrow(unique(na.omit(dataset(
+        )["species"]))),
+        icon = icon("stripe-s"),
+        color = "teal",
+        width = 4)
     })
     
     formattedData <- reactive({

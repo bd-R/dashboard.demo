@@ -41,7 +41,8 @@ Imports:
     bdvis,
     ggplot2,
     tidyr,
-    sunburstR
+    sunburstR,
+    summarytools
 RoxygenNote: 6.1.1
 URL: https://github.com/rahulchauhan049/dashboard.demo
 BugReports: https://github.com/rahulchauhan049/dashboard.demo/issues
