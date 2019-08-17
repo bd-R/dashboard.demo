@@ -19,42 +19,44 @@ mod_taxonomic_ui <- function(id) {
     fluidRow(
       column(
         6,
-        plotlyOutput(
-          ns("taxonomic_bar"),
-          height = "250px"
+        selectizeInput(
+          ns("taxo_bar_input_1"),
+          "Select Taxonomic Level",
+          c("Kingdom" = "1",
+            "Phylum" = "2",
+            "Order" = "3",
+            "Family" = "4",
+            "Genus" = "5",
+            "Species" = "6",
+            "basisOfRecord" = "7"
+          ),
+          selected = "7"
         ),
-        absolutePanel(
-          top = 10,
-          right = 10,
-          selectizeInput(
-            ns("taxo_bar_input"),
-            "Select Taxonomic Level",
-            c("Kingdom" = "1",
-              "Phylum" = "2",
-              "Order" = "3",
-              "Family" = "4",
-              "Genus" = "5",
-              "Species" = "6"
-            ),
-            selected = "3"
-          )
+        plotlyOutput(
+          ns("bar_1"),
+          height = "250px"
         )
       ),
       column(
         6,
-        circlepackeROutput(
-          ns("circleplot"),
-          height = "300px"
+        selectizeInput(
+          ns("taxo_bar_input_2"),
+          "Select Taxonomic Level",
+          c("identifiedBy" = "1",
+            "dateIdentified" = "2"
+          ),
+          selected = "1"
+        ),
+        plotlyOutput(
+          ns("bar_2"),
+          height = "250px"
         )
       )
     ),
     fluidRow(
       column(
-        6,
-        sunburstOutput(
-          ns("sunbrust"),
-          height = "300px"
-        )
+        12,
+        formattable::formattableOutput(ns("table"))
       )
     )
   )
@@ -68,135 +70,91 @@ mod_taxonomic_ui <- function(id) {
 
 mod_taxonomic_server <- function(input, output, session, data_taxo) {
   ns <- session$ns
-  output$taxonomic_bar <- renderPlotly({
-    label <- switch(as.integer(input$taxo_bar_input),
+  output$bar_1 <- renderPlotly({
+    label <- switch(as.integer(input$taxo_bar_input_1),
                     ~kingdom,
                     ~phylum,
                     ~order,
                     ~family,
                     ~genus,
-                    ~species
+                    ~species,
+                    ~basisOfRecord
                     )
     plot_ly(data = data_taxo(),
             y = label,
-            source = "taxoBar")
+            source = "taxobar_1")
   })
   
-  observe({
-    select <- event_data("plotly_click", source = "taxoBar")
-    if (is.null(select)) {
-      output$circleplot <- renderCirclepackeR({
-        dataforCircle <- formatData(data_taxo())
-        dataforCircle$pathString <-
-          paste(
-            "Vis",
-            dataforCircle$group,
-            dataforCircle$subgroup,
-            dataforCircle$subsubgroup,
-            sep = "/"
-          )
-        population <- as.Node(dataforCircle)
-        # Make the plot
-        circlepackeR(population, size = "value")
-      })
-    } else {
-      newData <- switch(as.integer(input$taxo_bar_input),
-                        data_taxo() %>%
-                          filter(kingdom %in% select$y),
-                        data_taxo() %>%
-                          filter(phylum %in% select$y),
-                        data_taxo() %>%
-                          filter(order %in% select$y),
-                        data_taxo() %>%
-                          filter(family %in% select$y),
-                        data_taxo() %>%
-                          filter(genus %in% select$y),
-                        data_taxo() %>%
-                          filter(species %in% select$y),
-                        )
-      if (nrow(newData) == 0) {
-        output$circleplot <- renderCirclepackeR({
-          dataforCircle <- formatData(data_taxo())
-          dataforCircle$pathString <-
-            paste(
-              "Vis",
-              dataforCircle$group,
-              dataforCircle$subgroup,
-              dataforCircle$subsubgroup,
-              sep = "/"
-            )
-          population <- as.Node(dataforCircle)
-          # Make the plot
-          circlepackeR(population, size = "value")
-        })
-      } else {
-        output$circleplot <- renderCirclepackeR({
-          dataforCircle <- formatData(newData)
-          dataforCircle$pathString <-
-            paste(
-              "Vis",
-              dataforCircle$group,
-              dataforCircle$subgroup,
-              dataforCircle$subsubgroup,
-              sep = "/"
-            )
-          population <- as.Node(dataforCircle)
-          # Make the plot
-          circlepackeR(population, size = "value")
-        })
-      }
-    }
+  output$bar_2 <- renderPlotly({
+    label <- switch(as.integer(input$taxo_bar_input_2),
+                    ~identifiedBy,
+                    ~dateIdentified
+    )
+    plot_ly(data = data_taxo(),
+            y = label,
+            source = "taxobar_2")
   })
   
-  output$sunbrust <- renderSunburst({
-    data <- data_taxo()
-    if (!nrow(data[-which(data[, "genus"] == ""), ]) == 0) {
-      data <- data[-which(data[, "genus"] == ""), ]
-    }
-    if (!nrow(data[-which(data[, "family"] == ""), ]) == 0) {
-      data <- data[-which(data[, "family"] == ""), ]
-    }
-    if (!nrow(data[-which(data[, "order"] == ""), ]) == 0) {
-      data <- data[-which(data[, "order"] == ""), ]
-    }
-    if (!nrow(data[-which(data[, "phylum"] == ""), ]) == 0) {
-      data <- data[-which(data[, "phylum"] == ""), ]
-    }
-    data <- arrange(data, family)
-    temp <- as.data.frame(table(data["genus"]))
-    data <- unique(data)
-    temp <- merge(data, temp , by.x = "genus", by.y = "Var1")
-    temp <- temp[c("phylum", "order", "family", "genus", "Freq")]
-    temp <- temp %>%
-      mutate(path = paste(phylum, order, family, genus, sep = "-")) %>%
-      dplyr::select(path, Freq)
-    
-    # Plot
-    sunburst(temp, legend = FALSE)
+  output$a <- renderPrint({
+    select1 <- event_data("plotly_click", source = "taxobar_1")
+    select1
   })
   
-  #Function
-  formatData <- function(data) {
-    data <- na.omit(data[c("phylum", "order", "family", "genus")])
-    if (!nrow(data[-which(data[, "phylum"] == ""),]) == 0) {
-      data <- data[-which(data[, "phylum"] == ""),]
+  output$b <- renderPrint({
+    select2 <- event_data("plotly_click", source = "taxobar_2")
+    select2
+  })
+
+  
+  output$table <- formattable::renderFormattable({
+    select1 <- event_data("plotly_click", source = "taxobar_1")
+    select2 <- event_data("plotly_click", source = "taxobar_2")
+    if(is.null(select1)&&is.null(select2)){
+      df <- data_taxo()[c("identifiedBy", "identifiedBy")]
+      formattable::formattable(df)
+    }else if(!is.null(select1)&&is.null(select2)){
+      df <- data_taxo() %>%
+        filter(switch(as.integer(input$taxo_bar_input_1),
+                      kingdom,
+                      phylum,
+                      order,
+                      family,
+                      genus,
+                      species,
+                      basisOfRecord
+        ) %in% select1$y)
+      df <- df[c("scientificName", "identifiedBy")]
+      formattable::formattable(df)
+    }else if(is.null(select1)&&!is.null(select2)){
+      df <- data_taxo() %>%
+        filter(switch(as.integer(input$taxo_bar_input_2),
+                      identifiedBy,
+                      dateIdentified
+
+        ) %in% select2$y)
+      df <- df[c("scientificName", "identifiedBy")]
+      formattable::formattable(df)
+    }else if(!is.null(select1)&&!is.null(select2)){
+      df <- data_taxo() %>%
+        filter(switch(as.integer(input$taxo_bar_input_2),
+                      identifiedBy,
+                      dateIdentified
+
+        ) %in% select2$y)
+      df <- df %>%
+        filter(switch(as.integer(input$taxo_bar_input_1),
+                      kingdom,
+                      phylum,
+                      order,
+                      family,
+                      genus,
+                      species,
+                      basisOfRecord
+        ) %in% select1$y)
+      df <- df[c("scientificName", "identifiedBy")]
+      formattable::formattable(df)
     }
-    if (!nrow(data[-which(data[, "order"] == ""),]) == 0) {
-      data <- data[-which(data[, "order"] == ""),]
-    }
-    if (!nrow(data[-which(data[, "family"] == ""),]) == 0) {
-      data <- data[-which(data[, "family"] == ""),]
-    }
-    if (!nrow(data[-which(data[, "genus"] == ""),]) == 0) {
-      data <- data[-which(data[, "genus"] == ""),]
-    }
-    data <- arrange(data, family)
-    temp <- as.data.frame(table(data["genus"]))
-    data <- unique(data)
-    temp <- merge(data, temp , by.x = "genus", by.y = "Var1")
-    temp <- temp[c("phylum", "order", "family", "genus", "Freq")]
-    colnames(temp) <-
-      c("root", "group", "subgroup", "subsubgroup", "value")
-    return(temp)
-  }
+
+  })
+
 }
