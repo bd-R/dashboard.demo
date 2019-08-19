@@ -15,6 +15,8 @@
 #' @import sunburstR
 #' @import formattable
 #' @import summarytools
+#' @import leaflet.extras
+#' @import sp
 app_ui <- function() {
   dashboardPage(
     skin = "green",

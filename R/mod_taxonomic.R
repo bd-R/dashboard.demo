@@ -43,8 +43,9 @@ mod_taxonomic_ui <- function(id) {
           ns("taxo_bar_input_2"),
           "Select Taxonomic Level",
           c("identifiedBy" = "1",
-            "dateIdentified" = "2"
-          ),
+            "year" = "2",
+            "countryCode" = "3"
+            ),
           selected = "1"
         ),
         plotlyOutput(
@@ -88,7 +89,8 @@ mod_taxonomic_server <- function(input, output, session, data_taxo) {
   output$bar_2 <- renderPlotly({
     label <- switch(as.integer(input$taxo_bar_input_2),
                     ~identifiedBy,
-                    ~dateIdentified
+                    ~year,
+                    ~countryCode
     )
     plot_ly(data = data_taxo(),
             y = label,
@@ -110,8 +112,8 @@ mod_taxonomic_server <- function(input, output, session, data_taxo) {
     select1 <- event_data("plotly_click", source = "taxobar_1")
     select2 <- event_data("plotly_click", source = "taxobar_2")
     if(is.null(select1)&&is.null(select2)){
-      df <- data_taxo()[c("identifiedBy", "identifiedBy")]
-      formattable::formattable(df)
+      df <- data_taxo()[c("scientificName", "dateIdentified", "countryCode")]
+      formattable::formattable(df, align = c("l",rep("r", NCOL(df) - 1)))
     }else if(!is.null(select1)&&is.null(select2)){
       df <- data_taxo() %>%
         filter(switch(as.integer(input$taxo_bar_input_1),
@@ -123,22 +125,24 @@ mod_taxonomic_server <- function(input, output, session, data_taxo) {
                       species,
                       basisOfRecord
         ) %in% select1$y)
-      df <- df[c("scientificName", "identifiedBy")]
-      formattable::formattable(df)
+      df <- df[c("scientificName", "dateIdentified", "countryCode")]
+      formattable::formattable(df, align = c("l",rep("r", NCOL(table) - 1)))
     }else if(is.null(select1)&&!is.null(select2)){
       df <- data_taxo() %>%
         filter(switch(as.integer(input$taxo_bar_input_2),
                       identifiedBy,
-                      dateIdentified
+                      year,
+                      countryCode
 
         ) %in% select2$y)
-      df <- df[c("scientificName", "identifiedBy")]
-      formattable::formattable(df)
+      df <- df[c("scientificName", "dateIdentified", "countryCode")]
+      formattable::formattable(df, align = c("l",rep("r", NCOL(table) - 1)))
     }else if(!is.null(select1)&&!is.null(select2)){
       df <- data_taxo() %>%
         filter(switch(as.integer(input$taxo_bar_input_2),
                       identifiedBy,
-                      dateIdentified
+                      year,
+                      countryCode
 
         ) %in% select2$y)
       df <- df %>%
@@ -151,8 +155,8 @@ mod_taxonomic_server <- function(input, output, session, data_taxo) {
                       species,
                       basisOfRecord
         ) %in% select1$y)
-      df <- df[c("scientificName", "identifiedBy")]
-      formattable::formattable(df)
+      df <- df[c("scientificName", "dateIdentified", "countryCode")]
+      formattable::formattable(df, align = c("l",rep("r", NCOL(table) - 1)))
     }
 
   })
