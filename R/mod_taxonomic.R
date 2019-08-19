@@ -53,11 +53,33 @@ mod_taxonomic_ui <- function(id) {
           height = "250px"
         )
       )
-    ),
-    fluidRow(
+    ), 
+    fluidRow(br(),
       column(
         12,
-        formattable::formattableOutput(ns("table"))
+        selectizeInput(
+          ns("show_vars"),
+          "Columns to show:",
+          choices = c(
+            "scientificName",
+            "kingdom",
+            "phylum",
+            "order",
+            "family",
+            "genus",
+            "species",
+            "identifiedBy",
+            "dateIdentified",
+            "year",
+            "month",
+            "day",
+            "taxonRemarks",
+            "taxonomicStatus"
+          ),
+          multiple = TRUE,
+          selected = c("scientificName", "kingdom", "phylum")
+        ),
+        DT::dataTableOutput(ns("table"))
       )
     )
   )
@@ -83,7 +105,21 @@ mod_taxonomic_server <- function(input, output, session, data_taxo) {
                     )
     plot_ly(data = data_taxo(),
             y = label,
-            source = "taxobar_1")
+            color = label,
+            source = "taxobar_1")%>%
+      layout(paper_bgcolor='transparent',
+             plot_bgcolor = "transparent",
+             showlegend = FALSE,
+             xaxis = list(
+               color = '#ffffff',
+               zeroline = TRUE,
+               showline = TRUE,
+               showticklabels = TRUE,
+               showgrid = FALSE),
+             yaxis = list(
+               color = '#ffffff',
+               showticklabels = TRUE,
+               showgrid = FALSE))
   })
   
   output$bar_2 <- renderPlotly({
@@ -94,7 +130,21 @@ mod_taxonomic_server <- function(input, output, session, data_taxo) {
     )
     plot_ly(data = data_taxo(),
             y = label,
-            source = "taxobar_2")
+            color = label,
+            source = "taxobar_2")%>%
+      layout(paper_bgcolor='transparent',
+             plot_bgcolor = "transparent",
+             showlegend = FALSE,
+             xaxis = list(
+               color = '#ffffff',
+               zeroline = TRUE,
+               showline = TRUE,
+               showticklabels = TRUE,
+               showgrid = FALSE),
+             yaxis = list(
+               color = '#ffffff',
+               showticklabels = TRUE,
+               showgrid = FALSE))
   })
   
   output$a <- renderPrint({
@@ -108,12 +158,11 @@ mod_taxonomic_server <- function(input, output, session, data_taxo) {
   })
 
   
-  output$table <- formattable::renderFormattable({
+  output$table <- DT::renderDataTable({
     select1 <- event_data("plotly_click", source = "taxobar_1")
     select2 <- event_data("plotly_click", source = "taxobar_2")
     if(is.null(select1)&&is.null(select2)){
-      df <- data_taxo()[c("scientificName", "dateIdentified", "countryCode")]
-      formattable::formattable(df, align = c("l",rep("r", NCOL(df) - 1)))
+    as.datatable(formattable::formattable(data_taxo()[input$show_vars], align = c("l",rep("r", NCOL(df) - 1))))
     }else if(!is.null(select1)&&is.null(select2)){
       df <- data_taxo() %>%
         filter(switch(as.integer(input$taxo_bar_input_1),
@@ -125,8 +174,7 @@ mod_taxonomic_server <- function(input, output, session, data_taxo) {
                       species,
                       basisOfRecord
         ) %in% select1$y)
-      df <- df[c("scientificName", "dateIdentified", "countryCode")]
-      formattable::formattable(df, align = c("l",rep("r", NCOL(table) - 1)))
+      as.datatable(formattable::formattable(df[input$show_vars], align = c("l",rep("r", NCOL(table) - 1))))
     }else if(is.null(select1)&&!is.null(select2)){
       df <- data_taxo() %>%
         filter(switch(as.integer(input$taxo_bar_input_2),
@@ -135,8 +183,7 @@ mod_taxonomic_server <- function(input, output, session, data_taxo) {
                       countryCode
 
         ) %in% select2$y)
-      df <- df[c("scientificName", "dateIdentified", "countryCode")]
-      formattable::formattable(df, align = c("l",rep("r", NCOL(table) - 1)))
+      as.datatable(formattable::formattable(df[input$show_vars], align = c("l",rep("r", NCOL(table) - 1))))
     }else if(!is.null(select1)&&!is.null(select2)){
       df <- data_taxo() %>%
         filter(switch(as.integer(input$taxo_bar_input_2),
@@ -155,8 +202,7 @@ mod_taxonomic_server <- function(input, output, session, data_taxo) {
                       species,
                       basisOfRecord
         ) %in% select1$y)
-      df <- df[c("scientificName", "dateIdentified", "countryCode")]
-      formattable::formattable(df, align = c("l",rep("r", NCOL(table) - 1)))
+      as.datatable(formattable::formattable(df[input$show_vars], align = c("l",rep("r", NCOL(table) - 1))))
     }
 
   })
