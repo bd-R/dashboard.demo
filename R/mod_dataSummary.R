@@ -74,34 +74,46 @@ mod_dataSummary_ui <- function(id) {
         style = 'padding:20px;',
         tabsetPanel(
           tabPanel(
-            "spatial",
-            formattable::formattableOutput(
-              ns("spatialTable")
-            )
-          ),
-          tabPanel(
-            "Temporal",
+            "spatial", br(),
             fluidRow(
               column(
-                3,
-                style = "padding:20px",
-                fluidRow(
-                  shinydashboard::valueBoxOutput(
-                    ns("yearstart"),
-                    width = "40%"
-                  )
-                ),
-                fluidRow(
-                  shinydashboard::valueBoxOutput(
-                    ns("yearend"),
-                    width = "40%"
-                  )
+                4,
+                shinydashboard::infoBoxOutput(
+                  ns("geo_coordinates"),
+                  width = "100%"
                 )
               ),
               column(
-                9,
-                formattable::formattableOutput(
-                  ns("temporalTable")
+                4,
+                shinydashboard::infoBoxOutput(
+                  ns("country_code"),
+                  width = "100%"
+                )
+              ),
+              column(
+                4,
+                shinydashboard::infoBoxOutput(
+                  ns("locality"),
+                  width = "100%"
+                )
+              )
+            )
+          ),
+          tabPanel(
+            "Temporal", br(),
+            fluidRow(
+              column(
+                6,
+                shinydashboard::infoBoxOutput(
+                  ns("startyear"),
+                  width = "100%"
+                )
+              ),
+              column(
+                6,
+                shinydashboard::infoBoxOutput(
+                  ns("endyear"),
+                  width = "100%"
                 )
               )
             )
@@ -293,33 +305,89 @@ function(input, output, session, dataset) {
         )
       })
     
-    output$yearstart <- shinydashboard::renderValueBox({
-      shinydashboard::valueBox(
-        value = min(na.omit(formattedData()["Year_"])),
-        subtitle = "Starting Year",
-        icon = icon("clock"),
-        color = "green",
-        width = 1
+    
+    
+    #Spatial.......................................
+    output$geo_coordinates <- shinydashboard::renderInfoBox({
+      latitude <- nrow((na.omit(dataset()["decimalLatitude"])))
+      longitude <- nrow((na.omit(dataset()["decimalLongitude"])))
+      shinydashboard::infoBox(
+        "# of Geo Coordinates",
+        if(latitude>longitude){
+          longitude
+        }else{
+          latitude
+        },
+        icon = icon("compass"),
+        color = "red",
+        width = 4
       )
     })
     
-    output$yearend <- shinydashboard::renderValueBox({
-      shinydashboard::valueBox(
-        value = max(na.omit(formattedData()["Year_"])),
-        subtitle = "ENd Year",
-        icon = icon("clock"),
-        color = "olive",
-        width = 1
+    output$country_code <- shinydashboard::renderInfoBox({
+      shinydashboard::infoBox(
+        "# of Countries",
+        nrow(unique(na.omit(dataset(
+          
+        )["countryCode"]))),
+        icon = icon("copyright"),
+        color = "navy",
+        width = 4
       )
     })
     
+    output$locality <- shinydashboard::renderInfoBox({
+      shinydashboard::infoBox(
+        "# of Localities",
+        nrow(unique(na.omit(dataset(
+          
+        )["locality"]))),
+        icon = icon("street-view"),
+        color = "yellow",
+        width = 4
+      )
+    })
+    
+    output$coordinate_uncertainty <- shinydashboard::renderInfoBox({
+      shinydashboard::infoBox(
+        "# of coordinateUncertaintyInMeters",
+        nrow(unique(na.omit(dataset(
+          
+        )["coordinateUncertaintyInMeters"]))),
+        icon = icon("compass"),
+        color = "teal",
+        width = 4
+      )
+    })
+    
+    #Temporal.......................................
+    output$startyear <- shinydashboard::renderInfoBox({
+      shinydashboard::infoBox(
+        "Starting Year",
+        min(na.omit(as.data.frame((dataset()["year"])))),
+        icon = icon("stripe-s"),
+        color = "teal",
+        width = 6
+      )
+    })
+    
+    output$endyear <- shinydashboard::renderInfoBox({
+      shinydashboard::infoBox(
+        "End Year",
+        max(na.omit(as.data.frame((dataset()["year"])))),
+        icon = icon("etsy"),
+        color = "navy",
+        width = 6
+      )
+    })
+    
+    
+    #Taxonomic.......................................
     output$kingdom <- shinydashboard::renderInfoBox({
       shinydashboard::infoBox(
         "# of Kingdom",
-        nrow(unique(na.omit(dataset(
-          
-        )["kingdom"]))),
-        icon = icon("clock"),
+        nrow(unique(na.omit(dataset()["kingdom"]))),
+        icon = icon("korvue"),
         color = "red",
         width = 4
       )
@@ -383,145 +451,5 @@ function(input, output, session, dataset) {
         width = 4)
     })
     
-    formattedData <- reactive({
-      dataset <- dataset()
-      dataForBar <- format_bdvis(dataset, source = 'rgbif')
-      names(dataForBar) = gsub("\\.", "_", names(dataForBar))
-      if ("Date_collected" %in% colnames(dataForBar)) {
-        if (length(which(!is.na(dataForBar$Date_collected))) == 0) {
-          stop("Date_collected has no data")
-        }
-        dayofYear <- as.numeric(
-          strftime(
-            as.Date(
-              dataForBar$Date_collected,
-              na.rm = T
-            ),
-            format = "%d"
-          )
-        )
-        weekofYear <- as.numeric(
-          strftime(
-            as.Date(
-              dataForBar$Date_collected,
-              na.rm = T
-            ),
-            format = "%U"
-          )
-        )
-        monthofYear <- as.numeric(
-          strftime(
-            as.Date(
-              dataForBar$Date_collected,
-              na.rm = T
-            ),
-            format = "%m"
-          )
-        )
-        Year_ = as.numeric(
-          strftime(
-            as.Date(
-              dataForBar$Date_collected,
-              na.rm = T
-            ),
-            format = "%Y"
-          )
-        )
-        dataForBar <-
-          cbind(dataForBar[c("basisOfRecord",
-                             "kingdom",
-                             "phylum",
-                             "order",
-                             "family",
-                             "genus",
-                             "species")], dayofYear, weekofYear, monthofYear, Year_)
-      } else {
-        stop("Date_collected not found in data. Please use format_bdvis() to fix the problem")
-      }
-      return(dataForBar)
-    })
-    
-    output$bar <- renderPlotly({
-      dataForBar <-
-        arrange(formattedData(), as.numeric(formattedData()$Year_))
-      dataForBar <- dataForBar[c(input$barselect, "Year_")]
-      dataForBar <-
-        data.frame(table(dataForBar)) %>%
-        dplyr::rename(
-          group = input$barselect,
-          variable = Year_,
-          value = Freq
-        )
-      plot_ly(
-        dataForBar,
-        source = "barselected",
-        x = ~ value,
-        y = ~ variable,
-        color = ~ group
-      ) %>%  
-        layout(showlegend = FALSE, height = 250) %>%
-        add_bars()
-    })
-    output$totalCountry <-
-      shinydashboard::renderValueBox({
-        shinydashboard::valueBox(
-          value = nrow(unique(dataset()["countryCode"])),
-          subtitle = "# of Countries",
-          icon = icon("area-chart"),
-          color = "aqua",
-          width = 1
-        )
-      })
-    
-    output$naCountry <-
-      shinydashboard::renderValueBox({
-        shinydashboard::valueBox(
-          value = rowSums(is.na(dataset()["countryCode"])),
-          subtitle = "# Missing country",
-          icon = icon("area-chart"),
-          color = "aqua",
-          width = 1
-        )
-      })
-    
-    output$countryBar <- renderPlotly({
-      country <-
-        data.frame(table(na.omit(dataset()["countryCode"]))) %>%
-        dplyr::rename(CountryName = Var1,
-                      NumberOfRecords = Freq)
-      plot_ly(
-        data = country,
-        x = ~ CountryName,
-        y = ~ NumberOfRecords,
-        name = "Countries",
-        type = "bar"
-      ) %>%
-        layout(showlegend = FALSE, height = 350)
-    })
-    
-    output$sunbrust <- renderSunburst({
-      data <- dataset()
-      if (!nrow(data[-which(data[, "genus"] == ""), ]) == 0) {
-        data <- data[-which(data[, "genus"] == ""), ]
-      }
-      if (!nrow(data[-which(data[, "family"] == ""), ]) == 0) {
-        data <- data[-which(data[, "family"] == ""), ]
-      }
-      if (!nrow(data[-which(data[, "order"] == ""), ]) == 0) {
-        data <- data[-which(data[, "order"] == ""), ]
-      }
-      if (!nrow(data[-which(data[, "phylum"] == ""), ]) == 0) {
-        data <- data[-which(data[, "phylum"] == ""), ]
-      }
-      data <- arrange(data, family)
-      temp <- as.data.frame(table(data["genus"]))
-      data <- unique(data)
-      temp <- merge(data, temp , by.x = "genus", by.y = "Var1")
-      temp <- temp[c("phylum", "order", "family", "genus", "Freq")]
-      temp <- temp %>%
-        mutate(path = paste(phylum, order, family, genus, sep = "-")) %>%
-        dplyr::select(path, Freq)
-      # Plot
-      sunburst(temp, legend = FALSE)
-    })
+
   }
