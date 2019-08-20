@@ -17,6 +17,7 @@
 #' @import summarytools
 #' @import leaflet.extras
 #' @import sp
+#' @import bddwc.app
 app_ui <- function() {
   dashboardPage(
     skin = "green",
@@ -70,7 +71,7 @@ app_ui <- function() {
         
         tabItem(tabName = "dataInputTab",
                 # -------------------------------
-                mod_dataInput_ui("dataInput_ui")
+                bddwc.app::mod_add_data_ui("bdFileInput")
                 # -------------------------------
         ),
         tabItem(tabName = "dataSummary",
@@ -114,7 +115,7 @@ app_ui <- function() {
 #' @import shiny
 #Function to attach Files such as css to shiny.
 golem_add_external_resources <- function() {
-  addResourcePath('www', system.file('app/www', package = 'bdvisShiny'))
+  addResourcePath('www', system.file('app/www', package = 'dashboard.demo'))
   
   tags$head(
     golem::activate_js(),

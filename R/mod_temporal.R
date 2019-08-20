@@ -34,6 +34,7 @@ mod_temporal_ui <- function(id) {
           ),
           selected = "basisOfRecord"
         ),
+        uiOutput(ns("back_bar")),
         plotlyOutput(
           ns("bar")
         )
@@ -75,10 +76,10 @@ mod_temporal_ui <- function(id) {
           ),
           selected = "1"
         ),
+        uiOutput(ns("back")),
         plotlyOutput(
           ns("time")
-        ),
-        uiOutput(ns("back"))
+        )
       )
     )
   )
@@ -92,20 +93,22 @@ mod_temporal_ui <- function(id) {
 mod_temporal_server <-
   function(input, output, session, data_temporal) {
     ns <- session$ns
-
+    
     #Plot bar graph
+    selectionsbar <- reactiveVal()
+    
     output$bar <- renderPlotly({
-      label <- switch(input$bar_select,
-                      "basisOfRecord" = ~basisOfRecord,
-                      "kingdom" = ~kingdom,
-                      "phylum" =  ~phylum,
-                      "order"  = ~order,
-                      "family" = ~family,
-                      "genus" = ~genus,
-                      "species" = ~species
-      )
+      if (length(selectionsbar()) == 0) {
         plot_ly(data = data_temporal(),
-                x = label,
+                x = switch(input$bar_select,
+                           "basisOfRecord" = ~basisOfRecord,
+                           "kingdom" = ~kingdom,
+                           "phylum" =  ~phylum,
+                           "order"  = ~order,
+                           "family" = ~family,
+                           "genus" = ~genus,
+                           "species" = ~species
+                ),
                 source = "bar_selected") %>%
           layout(paper_bgcolor='transparent',
                  plot_bgcolor = "transparent",
@@ -120,13 +123,62 @@ mod_temporal_server <-
                    color = '#ffffff',
                    showticklabels = TRUE,
                    showgrid = FALSE))
+      } else {
+        data_temporal() %>%
+          filter(switch(input$bar_select,
+                        "basisOfRecord" = basisOfRecord,
+                        "kingdom" = kingdom,
+                        "phylum" =  phylum,
+                        "order"  = order,
+                        "family" = family,
+                        "genus" = genus,
+                        "species" = species
+          ) %in% selectionsbar()) %>%
+          plot_ly(x = switch(input$bar_select,
+                             "basisOfRecord" = ~basisOfRecord,
+                             "kingdom" = ~kingdom,
+                             "phylum" =  ~phylum,
+                             "order"  = ~order,
+                             "family" = ~family,
+                             "genus" = ~genus,
+                             "species" = ~species
+                  ),
+                  source = "bar_selected") %>%
+          layout(paper_bgcolor='transparent',
+                 plot_bgcolor = "transparent",
+                 showlegend = FALSE,
+                 xaxis = list(
+                   color = '#ffffff',
+                   zeroline = TRUE,
+                   showline = TRUE,
+                   showticklabels = TRUE,
+                   showgrid = FALSE),
+                 yaxis = list(
+                   color = '#ffffff',
+                   showticklabels = TRUE,
+                   showgrid = FALSE))
+      }
     })
+    
+    observeEvent(event_data("plotly_click", source = "bar_selected"), {
+      new <- event_data("plotly_click", source = "bar_selected")$x
+      selectionsbar(new)
+    })
+    
+    # populate back button if category is chosen
+    output$back_bar <- renderUI({
+      if (length(selectionsbar())) 
+        actionButton(ns("clear_bar"), "Back/Reset", icon("chevron-left"))
+    })
+
+    # clear the chosen category on back button press
+    observeEvent(input$clear_bar, selectionsbar(NULL))
 
     #Violin Plot
     output$violin <- renderPlotly({
       df <- data_temporal()
-      select <- event_data("plotly_click", source = "bar_selected")
-      if(is.null(select)){
+      # select <- event_data("plotly_click", source = "bar_selected")
+      if(is.null(selectionsbar())){
         df %>%
           plot_ly(
           y = switch(input$violin_select,
@@ -174,7 +226,7 @@ mod_temporal_server <-
                           "family" = family,
                           "genus" = genus,
                           "species" = species
-            ) %in% select$x)
+            ) %in% selectionsbar())
           if(nrow(newData) == 0){
             newData <- df
           }
@@ -215,8 +267,7 @@ mod_temporal_server <-
     
   output$time <- renderPlotly({
     
-    nSelections <- length(selections())
-    if (nSelections == 0) {
+    if (length(selections()) == 0) {
       count(data_temporal(), switch(as.integer(input$timeselect),
                                     basisOfRecord,
                                     kingdom,

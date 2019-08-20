@@ -18,48 +18,6 @@ mod_spatial_ui <- function(id) {
 
   fluidPage(
     fluidRow(
-      column(
-        class = "noPadding",
-        4,
-        plotlyOutput(
-          ns("country_bar"),
-          height = "360px"
-        )
-      ),
-      column(
-        class =  "noPadding",
-        4,
-        plotlyOutput(
-          ns("pie"),
-          height = "360px"
-        ),
-        absolutePanel(
-          top = 10,
-          left = 20,
-          selectInput(
-            ns("pieselect"),
-            "Select Column to be displayed",
-            c(
-              "basisOfRecord",
-              "kingdom",
-              "phylum",
-              "order",
-              "family",
-              "genus",
-              "species"
-            ),
-            selected = "basisOfRecord"
-          )
-        )
-      ),
-      column(class = "noPadding",
-             4,
-             plotlyOutput(
-               ns("records"),
-               height = "360px")
-      )
-    ),
-    fluidRow(
       column(class = "noPadding",
              12,
              fluidRow(
@@ -94,11 +52,37 @@ mod_spatial_ui <- function(id) {
                       )
                       )
              ),
+             fluidRow(
              leafletOutput(
                ns("mymap"),
                height = "240px"
+             )),
+             fluidRow(br(),
+               selectizeInput(
+                 ns("show_vars"),
+                 "Columns to show:",
+                 choices = c(
+                   "scientificName",
+                   "countryCode",
+                   "locality",
+                   "decimalLatitude",
+                   "decimalLongitude",
+                   "coordinateUncertaintyInMeters",
+                   "coordinatePrecision",
+                   "elevation",
+                   "elevationAccuracy",
+                   "depth",
+                   "depthAccuracy",
+                   "establishmentMeans"
+                 ),
+                 multiple = TRUE,
+                 selected = c("scientificName", "kingdom", "phylum")
+               )
              ),
+             fluidRow(
+             #  verbatimTextOutput(ns("a"))
              DT::dataTableOutput(ns("ta"))
+             )
       )
     )
   )
@@ -112,30 +96,7 @@ mod_spatial_ui <- function(id) {
 mod_spatial_server <- function(input, output, session, data) {
   ns <- session$ns
 
-  output$country_bar <- renderPlotly({
-    country <-
-      data.frame(table(na.omit(data()["countryCode"]))) %>%
-      dplyr::rename(CountryName = Var1,
-                    NumberOfRecords = Freq
-      )
-    plot_ly(
-      data = country,
-      source = "barCountrt",
-      x = ~ CountryName,
-      y = ~ NumberOfRecords,
-      name = "Countries",
-      type = "bar"
-    ) %>%
-      layout(
-        showlegend = FALSE,
-        height = 320,
-        paper_bgcolor = '#000000',
-        plot_bgcolor = '#000000',
-        xaxis = list(color = '#ffffff'),
-        yaxis = list(color = '#ffffff'),
-        leagend = list(color = '#ffffff')
-      )
-  })
+  
 
       output$mymap <- renderLeaflet({
         leaflet(data = na.omit(data()[c("decimalLatitude", "decimalLongitude")])) %>%
@@ -152,14 +113,14 @@ mod_spatial_server <- function(input, output, session, data) {
       })
       
       
-      map_selected <- reactive({
+      output$ta <- DT::renderDataTable({
+          data()[input$show_vars]
+      })
+      
+      observeEvent(input$mymap_draw_new_feature, {
+        output$ta <- DT::renderDataTable({
         data <- na.omit(data()[c("decimalLatitude", "decimalLongitude")])
         cities_coordinates <- SpatialPointsDataFrame(data[,c("decimalLongitude","decimalLatitude")],data)
-        
-        #use the draw_stop event to detect when users finished drawing
-        req(input$mymap_draw_stop)
-        print(input$mymap_draw_new_feature)
-        
         
         #get the coordinates of the polygon
         polygon_coordinates <- input$mymap_draw_new_feature$geometry$coordinates[[1]]
@@ -172,412 +133,23 @@ mod_spatial_server <- function(input, output, session, data) {
         
         #print the name of the cities
         geo <- as.data.frame(
-          data[which(!is.na(selected_cities)), c("decimalLatitude", "decimalLongitude")])
+          data()[which(!is.na(selected_cities)), colnames(data())])
         
-        names(geo) <- c("decimalLatitude", "decimalLongitude")
-        return(geo)
+        geo[input$show_vars]
+        })
       })
-      output$ta <- DT::renderDataTable({
-        map_selected()
+      
+      observeEvent(input$mymap_draw_deleted_features,{
+        output$ta <- DT::renderDataTable({
+          data()[input$show_vars]
+        })
       })
+      
+      
+      output$a <- renderPrint({
+        input$mymap_draw_deleted_features
+      })
+      
     
   
-  
-  # observe({
-  #   click <- event_data("plotly_click", source = "barCountrt")
-  #   if (is.null(click)) {
-  #     output$mymap <- renderLeaflet({
-  #       leaflet(data = data()) %>%
-  #         addProviderTiles(input$mapTexture) %>%
-  #         addCircles( ~ decimalLongitude, ~ decimalLatitude, color = input$mapColor)
-  #     })
-  #   } else {
-  #     new <- data() %>% 
-  #       filter(countryCode %in% click$x)
-  #     leafletProxy("mymap", data = new) %>% 
-  #       clearShapes() %>%
-  #       addCircles( ~ decimalLongitude, ~ decimalLatitude, color = input$mapColor)
-  #   }
-  # })
-  
-  # observe({
-  #   click <- event_data("plotly_selected", source = "barCountrt")
-  #   if (is.null(click)) {
-  #     output$mymap <- renderLeaflet({
-  #       leaflet(data = data()) %>%
-  #         addProviderTiles(input$mapTexture) %>%
-  #         addCircles( ~ decimalLongitude, ~ decimalLatitude, color = input$mapColor)
-  #     })
-  #     output$temp <- renderText("as")
-  #   } else {
-  #     new <- data() %>% 
-  #       filter(countryCode %in% click$x)
-  #     leafletProxy("mymap", data = new) %>% 
-  #       clearShapes() %>%
-  #       addCircles( ~ decimalLongitude, ~ decimalLatitude, color = input$mapColor)
-  #   }
-  # })
-  
-  observe({
-    select <- event_data("plotly_click", source = "barCountrt")
-    if (is.null(select)) {
-      output$pie <- renderPlotly({
-        if (!nrow(data()[-which(data()[, input$pieselect] == ""),]) == 0) {
-          dataa <- data()[-which(data()[, input$pieselect] == ""),]
-        } else {
-          dataa <- data()
-        }
-        
-        plot_ly(
-          data = na.omit(dataa[c("basisOfRecord",
-                                 "kingdom",
-                                 "phylum",
-                                 "order",
-                                 "family",
-                                 "genus",
-                                 "species")]),
-          labels = label <- switch(input$pieselect,
-                                   "basisOfRecord" = ~basisOfRecord,
-                                   "kingdom" = ~kingdom,
-                                   "phylum" =  ~phylum,
-                                   "phylum"  = ~phylum,
-                                   "family" = ~family,
-                                   "genus" = ~genus,
-                                   "species" = ~species
-          ),
-          type = 'pie',
-          textposition = 'inside',
-          textinfo = 'label+percent',
-          insidetextfont = list(color = '#FFFFFF'),
-          hoverinfo = 'text'
-        ) %>% 
-          layout(
-            showlegend = FALSE,
-            height = 320,
-            paper_bgcolor = '#000000',
-            plot_bgcolor = '#000000',
-            xaxis = list(color = '#ffffff'),
-            yaxis = list(color = '#ffffff'),
-            leagend = list(color = '#ffffff')
-          )
-      })
-    } else {
-      #create new dataset based on where user clicked on bar graph
-      newData <- data() %>% 
-        filter(countryCode %in% select$x)
-      output$pie <- renderPlotly({
-        #Remove blank data from column(Blank! Not NA)
-        if (!nrow(newData[-which(newData[, input$pieselect] == ""),]) == 0) {
-          newData <- newData[-which(newData[, input$pieselect] == ""),]
-        }
-        plot_ly(
-          data = na.omit(newData[c("basisOfRecord",
-                                   "kingdom",
-                                   "phylum",
-                                   "order",
-                                   "family",
-                                   "genus",
-                                   "species")]),
-          labels = label <- switch(input$pieselect,
-                                   "basisOfRecord" = ~basisOfRecord,
-                                   "kingdom" = ~kingdom,
-                                   "phylum" =  ~phylum,
-                                   "phylum"  = ~phylum,
-                                   "family" = ~family,
-                                   "genus" = ~genus,
-                                   "species" = ~species
-          ),
-          type = 'pie',
-          textposition = 'inside',
-          textinfo = 'label+percent',
-          insidetextfont = list(color = '#FFFFFF'),
-          hoverinfo = 'text'
-        ) %>%
-          layout(
-            showlegend = FALSE,
-            height = 320,
-            paper_bgcolor = '#000000',
-            plot_bgcolor = '#000000',
-            xaxis = list(color = '#ffffff'),
-            yaxis = list(color = '#ffffff'),
-            leagend = list(color = '#ffffff')
-          )
-      })
-    }
-  })
-  
-  observe({
-    select <- event_data("plotly_selected", source = "barCountrt")
-    if (is.null(select)) {
-      output$pie <- renderPlotly({
-        if (!nrow(data()[-which(data()[, input$pieselect] == ""),]) == 0) {
-          dataa <- data()[-which(data()[, input$pieselect] == ""),]
-        } else {
-          dataa <- data()
-        }
-        
-        plot_ly(
-          data = na.omit(dataa[c("basisOfRecord",
-                                 "kingdom",
-                                 "phylum",
-                                 "order",
-                                 "family",
-                                 "genus",
-                                 "species")]),
-          labels = label <- switch(input$pieselect,
-                                   "basisOfRecord" = ~basisOfRecord,
-                                   "kingdom" = ~kingdom,
-                                   "phylum" =  ~phylum,
-                                   "phylum"  = ~phylum,
-                                   "family" = ~family,
-                                   "genus" = ~genus,
-                                   "species" = ~species
-          ),
-          type = 'pie',
-          textposition = 'inside',
-          textinfo = 'label+percent',
-          insidetextfont = list(color = '#FFFFFF'),
-          hoverinfo = 'text'
-        ) %>%
-          layout(
-            showlegend = FALSE,
-            height = 320,
-            paper_bgcolor = '#000000',
-            plot_bgcolor = '#000000',
-            xaxis = list(color = '#ffffff'),
-            yaxis = list(color = '#ffffff'),
-            leagend = list(color = '#ffffff')
-          )
-      })
-    } else {
-      #create new dataset based on where user clicked on bar graph
-      newData <- data() %>% 
-        filter(countryCode %in% select$x)
-      output$pie <- renderPlotly({
-        #Remove blank data from column(Blank! Not NA)
-        if (!nrow(newData[-which(newData[, input$pieselect] == ""),]) == 0) {
-          newData <- newData[-which(newData[, input$pieselect] == ""),]
-        }
-        
-        plot_ly(
-          data = na.omit(newData[c("basisOfRecord",
-                                   "kingdom",
-                                   "phylum",
-                                   "order",
-                                   "family",
-                                   "genus",
-                                   "species")]),
-          labels = label <- switch(input$pieselect,
-                                   "basisOfRecord" = ~basisOfRecord,
-                                   "kingdom" = ~kingdom,
-                                   "phylum" =  ~phylum,
-                                   "phylum"  = ~phylum,
-                                   "family" = ~family,
-                                   "genus" = ~genus,
-                                   "species" = ~species
-          ),
-          type = 'pie',
-          textposition = 'inside',
-          textinfo = 'label+percent',
-          insidetextfont = list(color = '#FFFFFF'),
-          hoverinfo = 'text'
-        ) %>% 
-          layout(
-            showlegend = FALSE,
-            height = 320,
-            paper_bgcolor = '#000000',
-            plot_bgcolor = '#000000',
-            xaxis = list(color = '#ffffff'),
-            yaxis = list(color = '#ffffff'),
-            leagend = list(color = '#ffffff')
-          )
-      })
-    }
-  })
-  
-  observe({
-    select <- event_data("plotly_click", source = "barCountrt")
-    if (is.null(select)) {
-      output$records <- renderPlotly({
-        dataload <- data()
-        recordData1 <-
-          (data.frame(
-            names <-
-              c(
-                "kingdom",
-                "phylum",
-                "order",
-                "family",
-                "genus",
-                "species"
-              ),
-            freq <-
-              c(
-                nrow(unique(na.omit(dataload["kingdom"]))),
-                nrow(unique(na.omit(dataload["phylum"]))),
-                nrow(unique(na.omit(dataload["order"]))),
-                nrow(unique(na.omit(dataload["family"]))),
-                nrow(unique(na.omit(dataload["genus"]))),
-                nrow(unique(na.omit(dataload["species"])))
-              )
-          ))
-        names(recordData1) <-
-          c("NameOfField", "NumberOfUniqueNames")
-        plot_ly(
-          data = recordData1,
-          x = ~ NameOfField,
-          y = ~ NumberOfUniqueNames,
-          name = "Frequency of records",
-          type = "bar"
-        ) %>%
-          layout(
-            showlegend = FALSE,
-            height = 320,
-            paper_bgcolor = '#000000',
-            plot_bgcolor = '#000000',
-            xaxis = list(color = '#ffffff'),
-            yaxis = list(color = '#ffffff'),
-            leagend = list(color = '#ffffff')
-          )
-      })
-    } else {
-      output$records <- renderPlotly({
-        newFilterData <- data() %>% 
-          filter(countryCode %in% select$x)
-        dataload <- newFilterData
-        recordData1 <-
-          (data.frame(
-            names <-
-              c(
-                "kingdom",
-                "phylum",
-                "order",
-                "family",
-                "genus",
-                "species"
-              ),
-            freq <-
-              c(
-                nrow(unique(na.omit(dataload["kingdom"]))),
-                nrow(unique(na.omit(dataload["phylum"]))),
-                nrow(unique(na.omit(dataload["order"]))),
-                nrow(unique(na.omit(dataload["family"]))),
-                nrow(unique(na.omit(dataload["genus"]))),
-                nrow(unique(na.omit(dataload["species"])))
-              )
-          ))
-        names(recordData1) <-
-          c("NameOfField", "NumberOfUniqueNames")
-        plot_ly(
-          data = recordData1,
-          x = ~ NameOfField,
-          y = ~ NumberOfUniqueNames,
-          name = "Frequency of records",
-          type = "bar"
-        ) %>% 
-          layout(
-            showlegend = FALSE,
-            height = 320,
-            paper_bgcolor = '#000000',
-            plot_bgcolor = '#000000',
-            xaxis = list(color = '#ffffff'),
-            yaxis = list(color = '#ffffff'),
-            leagend = list(color = '#ffffff')
-          )
-      })
-    }
-  })
-  
-  observe({
-    select <- event_data("plotly_selected", source = "barCountrt")
-    if (is.null(select)) {
-      output$records <- renderPlotly({
-        dataload <- data()
-        recordData1 <-
-          (data.frame(
-            names <-
-              c(
-                "kingdom",
-                "phylum",
-                "order",
-                "family",
-                "genus",
-                "species"
-              ),
-            freq <-
-              c(
-                nrow(unique(na.omit(dataload["kingdom"]))),
-                nrow(unique(na.omit(dataload["phylum"]))),
-                nrow(unique(na.omit(dataload["order"]))),
-                nrow(unique(na.omit(dataload["family"]))),
-                nrow(unique(na.omit(dataload["genus"]))),
-                nrow(unique(na.omit(dataload["species"])))
-              )
-          ))
-        names(recordData1) <-
-          c("NameOfField", "NumberOfUniqueNames")
-        plot_ly(
-          data = recordData1,
-          x = ~ NameOfField,
-          y = ~ NumberOfUniqueNames,
-          name = "Frequency of records",
-          type = "bar"
-        ) %>%
-          layout(
-            showlegend = FALSE,
-            height = 320,
-            paper_bgcolor = '#000000',
-            plot_bgcolor = '#000000',
-            xaxis = list(color = '#ffffff'),
-            yaxis = list(color = '#ffffff'),
-            leagend = list(color = '#ffffff')
-          )
-      })
-    } else {
-      output$records <- renderPlotly({
-        newFilterData <- data() %>%
-          filter(countryCode %in% select$x)
-        dataload <- newFilterData
-        recordData1 <-
-          (data.frame(
-            names <-
-              c(
-                "kingdom",
-                "phylum",
-                "order",
-                "family",
-                "genus",
-                "species"
-              ),
-            freq <-
-              c(
-                nrow(unique(na.omit(dataload["kingdom"]))),
-                nrow(unique(na.omit(dataload["phylum"]))),
-                nrow(unique(na.omit(dataload["order"]))),
-                nrow(unique(na.omit(dataload["family"]))),
-                nrow(unique(na.omit(dataload["genus"]))),
-                nrow(unique(na.omit(dataload["species"])))
-              )
-          ))
-        names(recordData1) <-
-          c("NameOfField", "NumberOfUniqueNames")
-        plot_ly(
-          data = recordData1,
-          x = ~ NameOfField,
-          y = ~ NumberOfUniqueNames,
-          name = "Frequency of records",
-          type = "bar"
-        ) %>%
-          layout(
-            showlegend = FALSE,
-            height = 320,
-            paper_bgcolor = '#000000',
-            plot_bgcolor = '#000000',
-            xaxis = list(color = '#ffffff'),
-            yaxis = list(color = '#ffffff'),
-            leagend = list(color = '#ffffff')
-          )
-      })
-    }
-  })
 }

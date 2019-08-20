@@ -43,7 +43,6 @@ mod_missing_data_server <-
           "decimalLatitude",
           "decimalLongitude",
           "coordinateUncertaintyInMeters",
-          "coordinatePrecision",
           "countryCode",
           "locality"
         )
@@ -52,7 +51,6 @@ mod_missing_data_server <-
         c(nrow(df["decimalLatitude"]),
           nrow(df["decimalLongitude"]),
           nrow(df["coordinateUncertaintyInMeters"]),
-          nrow(df["coordinatePrecision"]),
           nrow(df["countryCode"]),
           nrow(df["locality"]))
       
@@ -60,7 +58,6 @@ mod_missing_data_server <-
         c(sum(is.na(df["decimalLatitude"])),
           sum(is.na(df["decimalLongitude"])),
           sum(is.na(df["coordinateUncertaintyInMeters"])),
-          sum(is.na(df["coordinatePrecision"])),
           sum(is.na(df["countryCode"])),
           sum(is.na(df["locality"])))
       RecordsPercentage <-
@@ -79,11 +76,6 @@ mod_missing_data_server <-
               sum(is.na(df["coordinateUncertaintyInMeters"]))
           ) /
             nrow(df["coordinateUncertaintyInMeters"])), 2) * 100,
-          round(((
-            nrow(df["coordinatePrecision"]) -
-              sum(is.na(df["coordinatePrecision"]))
-          ) /
-            nrow(df["coordinatePrecision"])), 2) * 100,
           round(((
             nrow(df["countryCode"]) - sum(is.na(df["countryCode"]))
           ) /
