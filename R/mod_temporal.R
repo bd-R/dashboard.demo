@@ -59,25 +59,26 @@ mod_temporal_ui <- function(id) {
     ),
     fluidRow(
       column(
-        6,
+        12,
         class = "noPadding",
         selectInput(
-          ns("pieselect"),
+          ns("timeselect"),
           "Select Column to be displayed",
           c(
-            "basisOfRecord",
-            "kingdom",
-            "phylum",
-            "order",
-            "family",
-            "genus",
-            "species"
+            "basisOfRecord" = "1",
+            "kingdom" = "2",
+            "phylum" = "3",
+            "order" = "4",
+            "family" = "5",
+            "genus" = "6",
+            "species" = "7"
           ),
-          selected = "basisOfRecord"
+          selected = "1"
         ),
         plotlyOutput(
-          ns("pie")
-        )
+          ns("time")
+        ),
+        uiOutput(ns("back"))
       )
     )
   )
@@ -91,63 +92,7 @@ mod_temporal_ui <- function(id) {
 mod_temporal_server <-
   function(input, output, session, data_temporal) {
     ns <- session$ns
-    formattedData <- reactive({
-      dataForBar <- format_bdvis(data_temporal(), source = 'rgbif')
-      names(dataForBar) = gsub("\\.", "_", names(dataForBar))
-      if ("Date_collected" %in% colnames(dataForBar)) {
-        if (length(which(!is.na(dataForBar$Date_collected))) == 0) {
-          stop("Date_collected has no data")
-        }
-        dayofYear <- as.numeric(
-          strftime(
-            as.Date(
-              dataForBar$Date_collected,
-              na.rm = T
-            ),
-            format = "%d"
-          )
-        )
-        weekofYear <- as.numeric(
-          strftime(
-            as.Date(
-              dataForBar$Date_collected,
-              na.rm = T
-            ),
-            format = "%U"
-          )
-        )
-        monthofYear <- as.numeric(
-          strftime(
-            as.Date(
-              dataForBar$Date_collected,
-              na.rm = T
-            ),
-            format = "%m"
-          )
-        )
-        Year_ = as.numeric(
-          strftime(
-            as.Date(
-              dataForBar$Date_collected,
-              na.rm = T
-            ),
-            format = "%Y"
-          )
-        )
-        dataForBar <-
-          cbind(dataForBar[c("basisOfRecord",
-                             "kingdom",
-                             "phylum",
-                             "order",
-                             "family",
-                             "genus",
-                             "species")], dayofYear, weekofYear, monthofYear, Year_)
-      } else {
-        stop("Date_collected not found in data. Please use format_bdvis() to fix the problem")
-      }
-      return(dataForBar)
-    })
-    
+
     #Plot bar graph
     output$bar <- renderPlotly({
       label <- switch(input$bar_select,
@@ -162,14 +107,19 @@ mod_temporal_server <-
         plot_ly(data = data_temporal(),
                 x = label,
                 source = "bar_selected") %>%
-          layout(
-                showlegend = FALSE,
-                paper_bgcolor = '#000000',
-                plot_bgcolor = '#000000',
-                xaxis = list(color = '#ffffff'),
-                yaxis = list(color = '#ffffff'),
-                leagend = list(color = '#ffffff')
-        )
+          layout(paper_bgcolor='transparent',
+                 plot_bgcolor = "transparent",
+                 showlegend = FALSE,
+                 xaxis = list(
+                   color = '#ffffff',
+                   zeroline = TRUE,
+                   showline = TRUE,
+                   showticklabels = TRUE,
+                   showgrid = FALSE),
+                 yaxis = list(
+                   color = '#ffffff',
+                   showticklabels = TRUE,
+                   showgrid = FALSE))
     })
 
     #Violin Plot
@@ -179,27 +129,42 @@ mod_temporal_server <-
       if(is.null(select)){
         df %>%
           plot_ly(
-            y = switch(input$violin_select,
-                       "year" = ~year,
-                       "month" = ~month,
-                       "day" =  ~day
-            ),
-            type = 'violin',
-            box = list(
-              visible = T
-            ),
-            meanline = list(
-              visible = T
-            ),
-            x0 = input$violin_select
-          ) %>% 
-          layout(
-            yaxis = list(
-              title = "",
-              zeroline = F
-            )
+          y = switch(input$violin_select,
+                     "year" = ~year,
+                     "month" = ~month,
+                     "day" =  ~day
+          ),
+          split = switch(input$bar_select,
+                         "basisOfRecord" = ~basisOfRecord,
+                         "kingdom" = ~kingdom,
+                         "phylum" =  ~phylum,
+                         "order"  = ~order,
+                         "family" = ~family,
+                         "genus" = ~genus,
+                         "species" = ~species
+          ),
+          type = 'violin',
+          box = list(
+            visible = T
+          ),
+          meanline = list(
+            visible = T
           )
-        }else {
+        ) %>% 
+          layout(paper_bgcolor='transparent',
+                 plot_bgcolor = "transparent",
+                 showlegend = FALSE,
+                 xaxis = list(
+                   color = '#ffffff',
+                   zeroline = TRUE,
+                   showline = TRUE,
+                   showticklabels = TRUE,
+                   showgrid = FALSE),
+                 yaxis = list(
+                   color = '#ffffff',
+                   showticklabels = TRUE,
+                   showgrid = FALSE))
+      }else {
           newData <- data_temporal() %>%
             filter(switch(input$bar_select,
                           "basisOfRecord" = basisOfRecord,
@@ -229,108 +194,126 @@ mod_temporal_server <-
         ),
         x0 = input$violin_select
       ) %>% 
-      layout(
-        yaxis = list(
-          title = "",
-          zeroline = F
-        )
+      layout(paper_bgcolor='transparent',
+             plot_bgcolor = "transparent",
+             showlegend = FALSE,
+             xaxis = list(
+               color = '#ffffff',
+               zeroline = TRUE,
+               showline = TRUE,
+               showticklabels = TRUE,
+               showgrid = FALSE),
+             yaxis = list(
+               color = '#ffffff',
+               showticklabels = TRUE,
+               showgrid = FALSE)
       )
     }
   })
     
-    output$pie <- renderPlotly({
-      select <- event_data("plotly_click", source = "bar_selected")
-      if (!nrow(data_temporal()[-which(data_temporal()[, input$pieselect] == ""), ]) == 0) {
-        dataa <-
-          data_temporal()[-which(data_temporal()[, input$pieselect] == ""), ]
-      } else {
-        dataa <- data_temporal()
-      }
-      if(is.null(select)){
-        plot_ly(
-          data = na.omit(dataa[c("basisOfRecord",
-                                 "kingdom",
-                                 "phylum",
-                                 "order",
-                                 "family",
-                                 "genus",
-                                 "species")]),
-          labels = switch(input$pieselect,
-                          "basisOfRecord" = ~basisOfRecord,
-                          "kingdom" = ~kingdom,
-                          "phylum" =  ~phylum,
-                          "order"  = ~order,
-                          "family" = ~family,
-                          "genus" = ~genus,
-                          "species" = ~species
-          ),
-          type = 'pie',
-          textposition = 'inside',
-          textinfo = 'label+percent',
-          insidetextfont = list(color = '#FFFFFF'),
-          hoverinfo = 'text'
-        ) %>%
-          layout(
-            showlegend = FALSE,
-            paper_bgcolor = '#000000',
-            plot_bgcolor = '#000000',
-            xaxis = list(color = '#ffffff'),
-            yaxis = list(color = '#ffffff'),
-            leagend = list(color = '#ffffff')
-          )
-      } else {
-        newData <-
-          data_temporal() %>%
-          filter(switch(input$bar_select,
-                        "basisOfRecord" = basisOfRecord,
-                        "kingdom" = kingdom,
-                        "phylum" =  phylum,
-                        "order"  = order,
-                        "family" = family,
-                        "genus" = genus,
-                        "species" = species
-          ) %in% select$x)
-        if(nrow(newData)==0){
-          newData = dataa
-        }
-          #Remove blank data from column(Blank! Not NA)
-          if (!nrow(newData[-which(newData[, input$pieselect] == ""), ]) == 0) {
-            newData <- newData[-which(newData[, input$pieselect] == ""), ]
-          }
-          plot_ly(
-            data = na.omit(newData[c("basisOfRecord",
-                                     "kingdom",
-                                     "phylum",
-                                     "order",
-                                     "family",
-                                     "genus",
-                                     "species")]),
-            labels = switch(input$pieselect,
-                            "basisOfRecord" = ~basisOfRecord,
-                            "kingdom" = ~kingdom,
-                            "phylum" =  ~phylum,
-                            "phylum"  = ~phylum,
-                            "family" = ~family,
-                            "genus" = ~genus,
-                            "species" = ~species
-            ),
-            type = 'pie',
-            textposition = 'inside',
-            textinfo = 'label+percent',
-            insidetextfont = list(color = '#FFFFFF'),
-            hoverinfo = 'text'
-          ) %>%
-            layout(
-              showlegend = FALSE,
-              paper_bgcolor = '#000000',
-              plot_bgcolor = '#000000',
-              xaxis = list(color = '#ffffff'),
-              yaxis = list(color = '#ffffff'),
-              leagend = list(color = '#ffffff')
-            )
-      }
-      
-    })
+    selections <- reactiveVal()
+    
+  output$time <- renderPlotly({
+    
+    nSelections <- length(selections())
+    if (nSelections == 0) {
+      count(data_temporal(), switch(as.integer(input$timeselect),
+                                    basisOfRecord,
+                                    kingdom,
+                                    phylum,
+                                    order,
+                                    family,
+                                    genus,
+                                    species), year) %>%
+        setNames(c("color", "year", "value")) %>%
+        plot_ly()%>%
+        add_lines(x = ~year, y = ~value, color = ~color)%>%
+        layout(paper_bgcolor='transparent',
+               plot_bgcolor = "transparent",
+               showlegend = FALSE,
+               xaxis = list(
+                 color = '#ffffff',
+                 zeroline = TRUE,
+                 showline = TRUE,
+                 showticklabels = TRUE,
+                 showgrid = FALSE),
+               yaxis = list(
+                 color = '#ffffff',
+                 showticklabels = TRUE,
+                 showgrid = FALSE)
+        )
+    } else if(length(selections())==1){
+      data_temporal() %>%
+        filter(year %in% selections()) %>%
+        count(switch(as.integer(input$timeselect),
+                     basisOfRecord,
+                     kingdom,
+                     phylum,
+                     order,
+                     family,
+                     genus,
+                     species), month) %>%
+        setNames(c("color", "month", "value")) %>%
+        plot_ly()%>%
+        add_lines(x = ~month, y = ~value, color = ~color)%>%
+        layout(paper_bgcolor='transparent',
+               plot_bgcolor = "transparent",
+               showlegend = FALSE,
+               xaxis = list(
+                 color = '#ffffff',
+                 zeroline = TRUE,
+                 showline = TRUE,
+                 showticklabels = TRUE,
+                 showgrid = FALSE),
+               yaxis = list(
+                 color = '#ffffff',
+                 showticklabels = TRUE,
+                 showgrid = FALSE)
+        )
+    } else {
+      data_temporal() %>%
+        filter(month %in% selections()) %>%
+        count(switch(as.integer(input$timeselect),
+                     basisOfRecord,
+                     kingdom,
+                     phylum,
+                     order,
+                     family,
+                     genus,
+                     species), day) %>%
+        setNames(c("color", "day", "value")) %>%
+        plot_ly()%>%
+        add_lines(x = ~day, y = ~value, color = ~color)%>%
+        layout(paper_bgcolor='transparent',
+               plot_bgcolor = "transparent",
+               showlegend = FALSE,
+               xaxis = list(
+                 color = '#ffffff',
+                 zeroline = TRUE,
+                 showline = TRUE,
+                 showticklabels = TRUE,
+                 showgrid = FALSE),
+               yaxis = list(
+                 color = '#ffffff',
+                 showticklabels = TRUE,
+                 showgrid = FALSE)
+        )
+    }
+    
+  })
   
+  observeEvent(event_data("plotly_click"), {
+    new <- event_data("plotly_click")$x
+    old <- selections()
+    selections(c(old, new))
+  })
+  
+  # populate back button if category is chosen
+  output$back <- renderUI({
+    if (length(selections())) 
+      actionButton(ns("clear"), "Back", icon("chevron-left"))
+  })
+  observeEvent(input$clear, selections(NULL))
+
 
   }
