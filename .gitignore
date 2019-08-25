@@ -39,3 +39,4 @@ rsconnect/
 dev
 data-raw
 dashboard.demo.Rproj
+.gitignore

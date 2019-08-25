@@ -21,7 +21,7 @@
 app_ui <- function() {
   dashboardPage(
     skin = "green",
-    dashboardHeader(title = "bdvisashboard"),
+    dashboardHeader(title = "bdvis Dashboard"),
     #----------------------SideBar Start-------------------------------------
     dashboardSidebar(
       sidebarMenu(
@@ -58,9 +58,8 @@ app_ui <- function() {
           tabName = "temporalTab",
           icon = icon("clock")
         )
-      )#Sidebar menu ends here
+      )
     ),
-    #sidebar Dashboard ends here
     #----------------------SideBar End-------------------------------------
     
     #----------------------Body Start-------------------------------------
@@ -70,20 +69,18 @@ app_ui <- function() {
       tabItems(
         
         tabItem(tabName = "dataInputTab",
-                # -------------------------------
+                
                 bddwc.app::mod_add_data_ui("bdFileInput")
-                # -------------------------------
+                
         ),
         tabItem(tabName = "dataSummary",
-                # -------------------------------
                 mod_dataSummary_ui("dataSummary_ui")
-                # -------------------------------
                 ),
         tabItem(tabName = "missing_overview",
                 #--------------------------------
                 mod_missing_data_ui("missing_data_ui")
                 #--------------------------------
-                
+
         ),
         tabItem(tabName = "spatialTab",
                 # -------------------------------
@@ -107,9 +104,8 @@ app_ui <- function() {
                 # -------------------------------
         )
       )
-    )#Dashboard Body ends here
-    #-------------------------Body Ends Here-------------------------------
-  )#End of dashboard page
+    )
+  )
 }
 
 #' @import shiny

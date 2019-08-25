@@ -22,7 +22,7 @@ Authors@R: c(
         role = c("aut"))
     )
 Maintainer: Rahul Chauhan <rahul.chauhan049@gmail.com>
-Description: Provide feature to visualization biodiversity data. This is a easy to use shiny dashboard which allow to visualize different aspect of biodiversity data such as temporal, taxonomic, spatial.
+Description: Provides visualizations of biodiversity data. This is an easy to use shiny dashboard which allows visualizing different aspect of biodiversity like temporal, taxonomic and spatial.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
