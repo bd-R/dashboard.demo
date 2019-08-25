@@ -45,22 +45,21 @@ dashboard.demo::run_app()
 
 ### DataInput Tab
 
-DataInput tab is dedicated for dataset selection. User can continue with
-existing datasets or he can download a new dataset by clicking on
-“Download Data” tab on dashboard. User can also upload their own
-dataset.
+DataInput tab is dedicated for dataset selection. Fill required fields and click on query Database to download records. User can also upload their own dataset.
 
 ![DataInput Tab](inst/app/www/img/overview.PNG)
 
 ### DataSummart Tab
 
 DataSummary tab is made to give an overview of your dataset before
-visualization. Missing Data in dataset can create a huge impact on
-plots. Note that more the % of missing value, less you can trust the
-result. This tab helps you to understand that how much you can trust the
-visualizations.
+visualization. User can click on each tab to get summary of related fields.
 
 ![DataSummary](inst/app/www/img/summary.PNG)
+
+### Missing Data Tab
+This tab helps user to get % of missing records. Each tab contains related columns.
+
+![Missing Data](inst/app/www/img/missing.PNG)
 
 ### Spatial Tab
 
@@ -70,23 +69,19 @@ country, click on bar of that country. After that Aaa other plots will
 show data collected from that country only. Note: Double click at black
 area of bar chart to reset all graphs.
 
-![Spatial](inst/app/www/img/spatial.PNG)
+![Spatial](inst/app/www/img/spatial.gif)
 
 ### Taxonomic Tab
 
-Taxonomic Tab is to visualize the taxonomy of data. user can alos click
-on bar chart to filter all other plots accordingly. User can select
-different level of taxonomy from dropdown menu in bar chart.
+Taxonomic Tab is designed to visualize the taxonomy of data. Two bar graphs are used to filter the records. Select column of your choice and then click on records you want to filter data with.
 
-![Taxonomy](inst/app/www/img/taxonomic.PNG)
+![Taxonomy](inst/app/www/img/taxonomic.gif)
 
 ### Temporal Tab
 
-This tab is to visualize time related data. Click on a year in barchart
-to filter data accordingly. User can alos select multiple years by using
-selection box.
+This tab is to visualize time related data. 
 
-![Temporal](inst/app/www/img/temporal.PNG)
+![Temporal](inst/app/www/img/temporal.gif)
 
 
 ## We need your feedback :innocent:

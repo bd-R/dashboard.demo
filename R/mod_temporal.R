@@ -110,7 +110,7 @@ mod_temporal_ui <- function(id) {
 mod_temporal_server <- function(input, output, session, data_temporal){
   ns <- session$ns
   
-  #Plot bar graph
+  #Plot bar graph.
   selectionsbar <- reactiveVal()
     
   output$bar <- renderPlotly({
@@ -571,9 +571,7 @@ mod_temporal_server <- function(input, output, session, data_temporal){
       )
     }
   )
-  
-  
-  
+
   # populate back button if category is chosen
   output$back <- renderUI({
     if (length(selections())){

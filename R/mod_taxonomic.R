@@ -368,15 +368,27 @@ mod_taxonomic_server <- function(input, output, session, data_taxo) {
     })
     
     
-    output$table <- DT::renderDataTable({
-      if (is.null(selected_bar_1()) && is.null(selected_bar_2())) {
-        as.datatable(formattable::formattable(data_taxo()[input$show_vars], align = c("l", rep(
-          "r", NCOL(df) - 1
-        ))))
-      } else if (!is.null(selected_bar_1()) && is.null(selected_bar_2())) {
-        df <- data_taxo() %>%
-          filter(switch(
-            as.integer(input$taxo_bar_input_1),
+  output$table <- DT::renderDataTable({
+    if (is.null(selected_bar_1()) && is.null(selected_bar_2())) {
+      as.datatable(
+        formattable::formattable(
+          data_taxo()[input$show_vars],
+          align = c(
+            "l",
+            rep(
+              "r",
+              NCOL(df) - 1
+            )
+          )
+        )
+      )
+    } else if (!is.null(selected_bar_1()) && is.null(selected_bar_2())) {
+      df <- data_taxo() %>%
+        filter(
+          switch(
+            as.integer(
+              input$taxo_bar_input_1
+            ),
             kingdom,
             phylum,
             order,
@@ -384,55 +396,93 @@ mod_taxonomic_server <- function(input, output, session, data_taxo) {
             genus,
             species,
             basisOfRecord
-          ) %in% selected_bar_1()$y)
-        as.datatable(formattable::formattable(df[input$show_vars], align = c("l", rep(
-          "r", NCOL(table) - 1
-        ))))
-      } else if (is.null(selected_bar_1()) && !is.null(selected_bar_2())) {
-        df <- data_taxo() %>%
-          filter(switch(
-            as.integer(input$taxo_bar_input_2),
+          ) %in% 
+            selected_bar_1()$y
+        )
+      as.datatable(
+        formattable::formattable(
+          df[input$show_vars],
+          align = c(
+            "l",
+            rep(
+              "r",
+              NCOL(table) - 1
+            )
+          )
+        )
+      )
+    } else if (is.null(selected_bar_1()) && !is.null(selected_bar_2())) {
+      df <- data_taxo() %>%
+        filter(
+          switch(
+            as.integer(
+              input$taxo_bar_input_2
+            ),
             identifiedBy,
             year,
             countryCode
-            
-          ) %in% if (input$taxo_bar_input_2 == "2") {
-            selected_bar_2()$x
-          } else{
-            selected_bar_2()$y
-          })
-        as.datatable(formattable::formattable(df[input$show_vars], align = c("l", rep(
-          "r", NCOL(table) - 1
-        ))))
-      } else if (!is.null(selected_bar_1()) && !is.null(selected_bar_2())) {
+            ) %in% 
+            if (input$taxo_bar_input_2 == "2") {
+              selected_bar_2()$x
+            } else {
+              selected_bar_2()$y
+            }
+        )
+      as.datatable(
+        formattable::formattable(
+          df[input$show_vars],
+          align = c(
+            "l",
+            rep(
+              "r",
+              NCOL(table) - 1
+            )
+          )
+        )
+      )
+    } else if (!is.null(selected_bar_1()) && !is.null(selected_bar_2())) {
         df <- data_taxo() %>%
-          filter(switch(
-            as.integer(input$taxo_bar_input_2),
-            identifiedBy,
-            year,
-            countryCode
-            
-          ) %in% if (input$taxo_bar_input_2 == "2") {
-            selected_bar_2()$x
-          } else{
-            selected_bar_2()$y
-          })
+          filter(
+            switch(
+              as.integer(
+                input$taxo_bar_input_2
+              ),
+              identifiedBy,
+              year,
+              countryCode
+            ) %in% 
+              if (input$taxo_bar_input_2 == "2") {
+                selected_bar_2()$x
+              } else {
+                selected_bar_2()$y
+              }
+          )
         df <- df %>%
-          filter(switch(
-            as.integer(input$taxo_bar_input_1),
-            kingdom,
-            phylum,
-            order,
-            family,
-            genus,
-            species,
-            basisOfRecord
-          ) %in% selected_bar_1()$y)
-        as.datatable(formattable::formattable(df[input$show_vars], align = c("l", rep(
-          "r", NCOL(table) - 1
-        ))))
-      }
-      
-    })
-    
-  }
+          filter(
+            switch(
+              as.integer(input$taxo_bar_input_1),
+              kingdom,
+              phylum,
+              order,
+              family,
+              genus,
+              species,
+              basisOfRecord
+            ) %in% 
+            selected_bar_1()$y
+          )
+          as.datatable(
+            formattable::formattable(
+              df[input$show_vars],
+              align = c(
+                "l",
+                rep(
+                  "r",
+                  NCOL(table) - 1
+                )
+              )
+            )
+          )
+    }
+  })
+}

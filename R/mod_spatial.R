@@ -15,7 +15,6 @@
 #' @importFrom shiny NS tagList
 mod_spatial_ui <- function(id) {
   ns <- NS(id)
-
   fluidPage(
     fluidRow(
       column(

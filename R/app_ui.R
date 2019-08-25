@@ -22,7 +22,6 @@ app_ui <- function() {
   dashboardPage(
     skin = "green",
     dashboardHeader(title = "bdvis Dashboard"),
-    #----------------------SideBar Start-------------------------------------
     dashboardSidebar(
       sidebarMenu(
         id = "sideBar",
@@ -60,48 +59,35 @@ app_ui <- function() {
         )
       )
     ),
-    #----------------------SideBar End-------------------------------------
-    
-    #----------------------Body Start-------------------------------------
     dashboardBody(
-      shinyDashboardThemes(theme = "grey_dark"),
+      shinyDashboardThemes(
+        theme = "grey_dark"
+      ),
       golem_add_external_resources(),
       tabItems(
-        
-        tabItem(tabName = "dataInputTab",
-                
-                bddwc.app::mod_add_data_ui("bdFileInput")
-                
+        tabItem(
+          tabName = "dataInputTab",
+          bddwc.app::mod_add_data_ui("bdFileInput")
         ),
-        tabItem(tabName = "dataSummary",
-                mod_dataSummary_ui("dataSummary_ui")
-                ),
-        tabItem(tabName = "missing_overview",
-                #--------------------------------
-                mod_missing_data_ui("missing_data_ui")
-                #--------------------------------
-
+        tabItem(
+          tabName = "dataSummary",
+          mod_dataSummary_ui("dataSummary_ui")
         ),
-        tabItem(tabName = "spatialTab",
-                # -------------------------------
-
-                mod_spatial_ui("spatial_ui")
-
-                # -------------------------------
+        tabItem(
+          tabName = "missing_overview",
+          mod_missing_data_ui("missing_data_ui")
         ),
-        tabItem(tabName = "taxonomicTab",
-                # -------------------------------
-
-                mod_taxonomic_ui("taxonomic_ui")
-
-                # -------------------------------
+        tabItem(
+          tabName = "spatialTab",
+          mod_spatial_ui("spatial_ui")
         ),
-        tabItem(tabName = "temporalTab",
-                # -------------------------------
-
-                mod_temporal_ui("temporal_ui")
-
-                # -------------------------------
+        tabItem(
+          tabName = "taxonomicTab",
+          mod_taxonomic_ui("taxonomic_ui")
+        ),
+        tabItem(
+          tabName = "temporalTab",
+          mod_temporal_ui("temporal_ui")
         )
       )
     )

@@ -49,6 +49,7 @@ mod_missing_data_ui <- function(id) {
 
 mod_missing_data_server <- function(input, output, session, dataset_missing) {
   ns <- session$ns
+  #Calculating missing data and create the table for spatial Tab
   output$spatial_table <- formattable::renderFormattable({
     df <- dataset_missing()
     names <-
@@ -316,7 +317,8 @@ mod_missing_data_server <- function(input, output, session, dataset_missing) {
       )
     )
   })
-    
+  
+  #Calculating missing data and create the table for Temporal Tab  
   output$temporal_table <- formattable::renderFormattable({
     df <- dataset_missing()
     names <-
@@ -483,7 +485,7 @@ mod_missing_data_server <- function(input, output, session, dataset_missing) {
     )
   })
     
-    
+  #Calculating missing data and create the table for Taxonomic Tab
   output$taxonomic_table <- formattable::renderFormattable({
     df <- dataset_missing()
     names <-
