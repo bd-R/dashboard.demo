@@ -57,7 +57,13 @@ mod_missing_data_server <- function(input, output, session, dataset_missing) {
         "decimal_longitude",
         "coordinate_uncertainty_in_meters",
         "country_code",
-        "locality"
+        "locality",
+        "coordinate_precision",
+        "elevation",
+        "elevation_accuracy",
+        "depth",
+        "depth_accuracy",
+        "establishment_means"
       )
     
     TotalRecords <-
@@ -65,14 +71,28 @@ mod_missing_data_server <- function(input, output, session, dataset_missing) {
         nrow(df["decimalLongitude"]),
         nrow(df["coordinateUncertaintyInMeters"]),
         nrow(df["countryCode"]),
-        nrow(df["locality"]))
+        nrow(df["locality"]),
+        nrow(df["coordinatePrecision"]),
+        nrow(df["elevation"]),
+        nrow(df["elevationAccuracy"]),
+        nrow(df["depth"]),
+        nrow(df["depthAccuracy"]),
+        nrow(df["establishmentMeans"])
+      )
     
     MissingRecords <-
       c(sum(is.na(df["decimalLatitude"])),
         sum(is.na(df["decimalLongitude"])),
         sum(is.na(df["coordinateUncertaintyInMeters"])),
         sum(is.na(df["countryCode"])),
-        sum(is.na(df["locality"])))
+        sum(is.na(df["locality"])),
+        sum(is.na(df["coordinatePrecision"])),
+        sum(is.na(df["elevation"])),
+        sum(is.na(df["elevationAccuracy"])),
+        sum(is.na(df["depth"])),
+        sum(is.na(df["depthAccuracy"])),
+        sum(is.na(df["establishmentMeans"]))
+      )
   
     RecordsPercentage <-
       c(
@@ -157,6 +177,108 @@ mod_missing_data_server <- function(input, output, session, dataset_missing) {
             ) /
               nrow(
                 df["locality"]
+              )
+          ),
+          2
+        ) * 100,
+        round(
+          (
+            (
+              nrow(
+                df["coordinatePrecision"]
+              ) - sum(
+                is.na(
+                  df["coordinatePrecision"]
+                )
+              )
+            ) /
+              nrow(
+                df["coordinatePrecision"]
+              )
+          ),
+          2
+        ) * 100,
+        round(
+          (
+            (
+              nrow(
+                df["elevation"]
+              ) - sum(
+                is.na(
+                  df["elevation"]
+                )
+              )
+            ) /
+              nrow(
+                df["elevation"]
+              )
+          ),
+          2
+        ) * 100,
+        round(
+          (
+            (
+              nrow(
+                df["elevationAccuracy"]
+              ) - sum(
+                is.na(
+                  df["elevationAccuracy"]
+                )
+              )
+            ) /
+              nrow(
+                df["elevationAccuracy"]
+              )
+          ),
+          2
+        ) * 100,
+        round(
+          (
+            (
+              nrow(
+                df["depth"]
+              ) - sum(
+                is.na(
+                  df["depth"]
+                )
+              )
+            ) /
+              nrow(
+                df["depth"]
+              )
+          ),
+          2
+        ) * 100,
+        round(
+          (
+            (
+              nrow(
+                df["depthAccuracy"]
+              ) - sum(
+                is.na(
+                  df["depthAccuracy"]
+                )
+              )
+            ) /
+              nrow(
+                df["depthAccuracy"]
+              )
+          ),
+          2
+        ) * 100,
+        round(
+          (
+            (
+              nrow(
+                df["establishmentMeans"]
+              ) - sum(
+                is.na(
+                  df["establishmentMeans"]
+                )
+              )
+            ) /
+              nrow(
+                df["establishmentMeans"]
               )
           ),
           2
@@ -372,7 +494,15 @@ mod_missing_data_server <- function(input, output, session, dataset_missing) {
         "family",
         "genus",
         "species",
-        "identified_by"
+        "identified_by",
+        "infraspecificEpithet",
+        "taxon_rank",
+        "scientific_name",
+        "taxon_key",
+        "species_key",
+        "date_identified",
+        "recorded_by",
+        "record_number"
       )
       
     TotalRecords <-
@@ -382,7 +512,16 @@ mod_missing_data_server <- function(input, output, session, dataset_missing) {
         nrow(df["family"]),
         nrow(df["genus"]),
         nrow(df["species"]),
-        nrow(df["identifiedBy"]))
+        nrow(df["identifiedBy"]),
+        nrow(df["infraspecificEpithet"]),
+        nrow(df["taxonRank"]),
+        nrow(df["scientificName"]),
+        nrow(df["taxonKey"]),
+        nrow(df["speciesKey"]),
+        nrow(df["dateIdentified"]),
+        nrow(df["recordedBy"]),
+        nrow(df["recordNumber"])
+      )
     
     MissingRecords <-
       c(sum(is.na(df["kingdom"])),
@@ -391,7 +530,16 @@ mod_missing_data_server <- function(input, output, session, dataset_missing) {
         sum(is.na(df["family"])),
         sum(is.na(df["genus"])),
         sum(is.na(df["species"])),
-        sum(is.na(df["identifiedBy"])))
+        sum(is.na(df["identifiedBy"])),
+        sum(is.na(df["infraspecificEpithet"])),
+        sum(is.na(df["taxonRank"])),
+        sum(is.na(df["scientificName"])),
+        sum(is.na(df["taxonKey"])),
+        sum(is.na(df["speciesKey"])),
+        sum(is.na(df["dateIdentified"])),
+        sum(is.na(df["recordedBy"])),
+        sum(is.na(df["recordNumber"]))
+      )
     
     RecordsPercentage <-
       c(
@@ -510,6 +658,142 @@ mod_missing_data_server <- function(input, output, session, dataset_missing) {
             ) /
               nrow(
                 df["identifiedBy"]
+              )
+          ),
+          2
+        ) * 100,
+        round(
+          (
+            (
+              nrow(
+                df["infraspecificEpithet"]
+              ) - sum(
+                is.na(
+                  df["infraspecificEpithet"]
+                )
+              )
+            ) /
+              nrow(
+                df["infraspecificEpithet"]
+              )
+          ),
+          2
+        ) * 100,
+        round(
+          (
+            (
+              nrow(
+                df["taxonRank"]
+              ) - sum(
+                is.na(
+                  df["taxonRank"]
+                )
+              )
+            ) /
+              nrow(
+                df["taxonRank"]
+              )
+          ),
+          2
+        ) * 100,
+        round(
+          (
+            (
+              nrow(
+                df["scientificName"]
+              ) - sum(
+                is.na(
+                  df["scientificName"]
+                )
+              )
+            ) /
+              nrow(
+                df["scientificName"]
+              )
+          ),
+          2
+        ) * 100,
+        round(
+          (
+            (
+              nrow(
+                df["taxonKey"]
+              ) - sum(
+                is.na(
+                  df["taxonKey"]
+                )
+              )
+            ) /
+              nrow(
+                df["taxonKey"]
+              )
+          ),
+          2
+        ) * 100,
+        round(
+          (
+            (
+              nrow(
+                df["speciesKey"]
+              ) - sum(
+                is.na(
+                  df["speciesKey"]
+                )
+              )
+            ) /
+              nrow(
+                df["speciesKey"]
+              )
+          ),
+          2
+        ) * 100,
+        round(
+          (
+            (
+              nrow(
+                df["dateIdentified"]
+              ) - sum(
+                is.na(
+                  df["dateIdentified"]
+                )
+              )
+            ) /
+              nrow(
+                df["dateIdentified"]
+              )
+          ),
+          2
+        ) * 100,
+        round(
+          (
+            (
+              nrow(
+                df["recordedBy"]
+              ) - sum(
+                is.na(
+                  df["recordedBy"]
+                )
+              )
+            ) /
+              nrow(
+                df["recordedBy"]
+              )
+          ),
+          2
+        ) * 100,
+        round(
+          (
+            (
+              nrow(
+                df["recordNumber"]
+              ) - sum(
+                is.na(
+                  df["recordNumber"]
+                )
+              )
+            ) /
+              nrow(
+                df["recordNumber"]
               )
           ),
           2

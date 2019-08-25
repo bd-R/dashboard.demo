@@ -59,7 +59,7 @@ mod_temporal_ui <- function(id) {
         verbatimTextOutput(ns("a"))
       )
     ),
-    fluidRow(
+    fluidRow(class = "top_padding",
       column(
         6,
         class = "noPadding",
@@ -87,7 +87,8 @@ mod_temporal_ui <- function(id) {
         3,
         "Month Selected: ",
         verbatimTextOutput(ns("month_clicked"))
-      ),
+      )
+    ),fluidRow(
       column(
         12,
         uiOutput(
