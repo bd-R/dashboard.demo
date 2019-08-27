@@ -213,4 +213,5 @@ mod_spatial_server <- function(input, output, session, data) {
       })
     }
   )
+  
 }

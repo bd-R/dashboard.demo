@@ -5,4 +5,3 @@ dev_history.R
 ^dev$
 $run_dev.*
 ^CODE_OF_CONDUCT\.md$
-^inst\app\www\img

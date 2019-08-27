@@ -1,23 +1,7 @@
-#' @import shiny
-#' @import shinydashboard
-#' @import leaflet
-#' @import dplyr
-#' @import dashboardthemes
-#' @import ggpubr
-#' @import plotly
-#' @import circlepackeR
-#' @import data.tree
-#' @import flexdashboard
-#' @import bdvis
-#' @import ggplot2
-#' @import tidyr
-#' @import treemap
-#' @import sunburstR
-#' @import formattable
-#' @import summarytools
-#' @import leaflet.extras
-#' @import sp
-#' @import bddwc.app
+#' @import shiny shinydashboard leaflet dplyr dashboardthemes ggpubr plotly
+#' @import circlepackeR data.tree flexdashboard bdvis ggplot2 tidyr treemap
+#' @import sunburstR formattable summarytools leaflet.extras sp bddwc.app
+
 app_ui <- function() {
   dashboardPage(
     skin = "green",

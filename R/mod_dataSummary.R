@@ -391,7 +391,7 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
       "# of Geo Coordinates",
       if(latitude>longitude){
         longitude
-      }else{
+      } else {
         latitude
       },
       icon = icon("compass"),
@@ -582,4 +582,5 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
       width = 4
     )
   })
+  
 }

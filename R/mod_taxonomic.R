@@ -485,4 +485,5 @@ mod_taxonomic_server <- function(input, output, session, data_taxo) {
           )
     }
   })
+  
 }
