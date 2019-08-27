@@ -25,7 +25,7 @@ You can install the development version of dashboard.demo from
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("rahulchauhan049/dashboard.demo")
+devtools::install_github("bd-R/dashboard.demo")
 ```
 
 ``` r
@@ -86,6 +86,6 @@ This tab is to visualize time related data.
 
 ## We need your feedback :innocent:
 
-Please submit your feedback using this **[link](https://github.com/rahulchauhan049/dashboard.demo/issues/new)**
+Please submit your feedback using this **[link](https://github.com/bd-R/dashboard.demo/issues/new)**
 
    :deciduous_tree: :mushroom: :shell: :fish: :frog: :honeybee: :turtle: :rooster: :whale2: :monkey: :octocat: 
