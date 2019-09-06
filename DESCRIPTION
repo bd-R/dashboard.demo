@@ -36,13 +36,11 @@ Imports:
     dplyr,
     ggpubr,
     plotly,
-    circlepackeR,
     data.tree,
     flexdashboard,
     bdvis,
     ggplot2,
     tidyr,
-    summarytools,
     leaflet.extras,
     sp,
     bddwc.app
