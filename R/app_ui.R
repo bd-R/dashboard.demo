@@ -1,6 +1,6 @@
 #' @import shiny shinydashboard leaflet dplyr dashboardthemes ggpubr plotly
-#' @import circlepackeR data.tree flexdashboard bdvis ggplot2 tidyr treemap
-#' @import sunburstR formattable summarytools leaflet.extras sp bddwc.app
+#' @import data.tree flexdashboard bdvis ggplot2 tidyr treemap
+#' @import formattable summarytools leaflet.extras sp bddwc.app
 
 app_ui <- function() {
   dashboardPage(
