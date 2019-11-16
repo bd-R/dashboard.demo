@@ -7,6 +7,7 @@
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+[![Launch Rstudio Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/tom-gu/dashboard.demo/master?urlpath=rstudio)
 <!-- badges: end -->
 
 The goal of dashboard.demo is to provide an interactive shiny package

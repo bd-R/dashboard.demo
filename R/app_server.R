@@ -5,7 +5,7 @@ app_server <- function(input, output, session) {
 
   inputDataset <-
     callModule(
-      bddwc.app::mod_add_data_server,
+      bdutilities.app::mod_add_data_server,
       id = "bdFileInput"
     )
 

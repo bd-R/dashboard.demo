@@ -51,7 +51,7 @@ app_ui <- function() {
       tabItems(
         tabItem(
           tabName = "dataInputTab",
-          bddwc.app::mod_add_data_ui("bdFileInput")
+          bdutilities.app::mod_add_data_ui("bdFileInput")
         ),
         tabItem(
           tabName = "dataSummary",
