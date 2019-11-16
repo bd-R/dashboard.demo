@@ -27,6 +27,7 @@ mod_spatial_ui <- function(id) {
               ns("mapTexture"),
               "Map Texture",
               choices = list(
+                "OpenTopoMap" = "OpenTopoMap",
                 "OpenStreetMap.Mapnik" = "OpenStreetMap.Mapnik",
                 "OpenStreetMap.BlackAndWhite" = "OpenStreetMap.BlackAndWhite",
                 "Stamen.Toner" = "Stamen.Toner",
@@ -37,7 +38,7 @@ mod_spatial_ui <- function(id) {
                 "Esri.WorldImagery" = "Esri.WorldImagery",
                 "Esri.WorldTerrain" = "Esri.WorldTerrain"
               ),
-              selected = "Stamen.Toner"
+              selected = "OpenTopoMap"
             )
           ),
           column(
@@ -77,7 +78,8 @@ mod_spatial_ui <- function(id) {
               "elevationAccuracy",
               "depth",
               "depthAccuracy",
-              "establishmentMeans"
+              "establishmentMeans",
+              "basisOfRecord"
             ),
             multiple = TRUE,
             selected = c(
@@ -118,6 +120,12 @@ mod_spatial_server <- function(input, output, session, data) {
         ~ decimalLongitude,
        ~ decimalLatitude,
        color = input$mapColor
+      ) %>%
+      fitBounds(
+        ~min(decimalLongitude),
+        ~min(decimalLatitude),
+        ~max(decimalLongitude),
+        ~max(decimalLatitude)
      ) %>%
      leaflet.extras::addDrawToolbar(
        targetGroup='draw',
