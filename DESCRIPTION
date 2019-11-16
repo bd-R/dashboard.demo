@@ -25,7 +25,10 @@ Authors@R: c(
 Maintainer: Rahul Chauhan <rahul.chauhan049@gmail.com>
 Description: Provides visualizations of biodiversity data. This is an easy to use shiny dashboard which allows visualizing different aspect of biodiversity like temporal, taxonomic and spatial.
 License: GPL-3
-Depends: 
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    bdvis,
     dashboard.demo,
     dashboardthemes,
     data.tree,
@@ -42,14 +45,14 @@ Depends:
     shiny,
     shinydashboard,
     sp,
-    summarytools,
     testthat,
     tidyr
 Remotes: 
-    bd-R/bdutilities.app,
+    bd-R/bddwc.app,
     bd-R/bdvis,
     nik01010/dashboardthemes
-Encoding: UTF-8
-LazyData: true
+RoxygenNote: 6.1.1
 URL: https://github.com/bd-R/dashboard.demo
 BugReports: https://github.com/bd-R/dashboard.demo/issues
+Suggests: 
+    testthat (>= 2.1.0)
