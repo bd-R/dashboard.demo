@@ -1,4 +1,4 @@
-FROM rocker/binder:3.6.1
+FROM rocker/binder:3.6.0
 LABEL maintainer='Tomer Gueta'
 USER root
 COPY . ${HOME}
