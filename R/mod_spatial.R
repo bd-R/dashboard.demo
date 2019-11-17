@@ -17,82 +17,70 @@ mod_spatial_ui <- function(id) {
   ns <- NS(id)
   fluidPage(
     fluidRow(
-      column(
-        class = "noPadding",
-        12,
-        fluidRow(
-          column(
-            6,
-            selectInput(
-              ns("mapTexture"),
-              "Map Texture",
-              choices = list(
-                "OpenTopoMap" = "OpenTopoMap",
-                "OpenStreetMap.Mapnik" = "OpenStreetMap.Mapnik",
-                "OpenStreetMap.BlackAndWhite" = "OpenStreetMap.BlackAndWhite",
-                "Stamen.Toner" = "Stamen.Toner",
-                "CartoDB.Positron" = "CartoDB.Positron",
-                "Esri.NatGeoWorldMap" = "Esri.NatGeoWorldMap",
-                "Stamen.Watercolor" = "Stamen.Watercolor",
-                "Stamen.Terrain" = "Stamen.Terrain",
-                "Esri.WorldImagery" = "Esri.WorldImagery",
-                "Esri.WorldTerrain" = "Esri.WorldTerrain"
-              ),
-              selected = "OpenTopoMap"
-            )
+      leafletOutput(ns("mymap"), height = "450"),
+      absolutePanel(
+        top = 130,
+        right = 20,
+        selectInput(
+          ns("mapTexture"),
+          "Map Texture",
+          choices = list(
+            "OpenTopoMap" = "OpenTopoMap",
+            "OpenStreetMap.Mapnik" = "OpenStreetMap.Mapnik",
+            "OpenStreetMap.BlackAndWhite" = "OpenStreetMap.BlackAndWhite",
+            "Stamen.Toner" = "Stamen.Toner",
+            "CartoDB.Positron" = "CartoDB.Positron",
+            "Esri.NatGeoWorldMap" = "Esri.NatGeoWorldMap",
+            "Stamen.Watercolor" = "Stamen.Watercolor",
+            "Stamen.Terrain" = "Stamen.Terrain",
+            "Esri.WorldImagery" = "Esri.WorldImagery",
+            "Esri.WorldTerrain" = "Esri.WorldTerrain"
           ),
-          column(
-            6,
-            selectInput(
-              ns("mapColor"),
-              "Points Color",
-              choices = list(
-                "Red" = 'red',
-                "Green" = "green",
-                "Blue" = "blue",
-                "Black" = "black"
-              )
-            )
-          )
+          selected = "OpenTopoMap"
         ),
-        fluidRow(
-          leafletOutput(
-            ns("mymap"),
-            height = "400px"
-          )
-        ),
-        fluidRow(
-          br(),
-          selectizeInput(
-            ns("show_vars"),
-            "Columns to show:",
-            choices = c(
-              "scientificName",
-              "countryCode",
-              "locality",
-              "decimalLatitude",
-              "decimalLongitude",
-              "coordinateUncertaintyInMeters",
-              "coordinatePrecision",
-              "elevation",
-              "elevationAccuracy",
-              "depth",
-              "depthAccuracy",
-              "establishmentMeans",
-              "basisOfRecord"
-            ),
-            multiple = TRUE,
-            selected = c(
-              "scientificName",
-              "basisOfRecord"
-            )
-          )
-        ),
-        fluidRow(
-          DT::dataTableOutput(
-            ns("table")
-          )
+        selectInput(
+          ns("mapColor"),
+          "Points Color",
+          choices = list(
+            "Red" = 'red',
+            "Green" = "green",
+            "Blue" = "blue",
+            "Black" = "black"
+          ),
+          selected = "blue"
         )
+      )
+    ),
+    fluidRow(
+      br(),
+      selectizeInput(
+        ns("show_vars"),
+        "Columns to show:",
+        choices = c(
+          "scientificName",
+          "countryCode",
+          "locality",
+          "decimalLatitude",
+          "decimalLongitude",
+          "coordinateUncertaintyInMeters",
+          "coordinatePrecision",
+          "elevation",
+          "elevationAccuracy",
+          "depth",
+          "depthAccuracy",
+          "establishmentMeans",
+          "basisOfRecord"
+        ),
+        multiple = TRUE,
+        selected = c(
+          "scientificName",
+          "basisOfRecord"
+        )
+      )
+    ),
+    fluidRow(
+      DT::dataTableOutput(
+        ns("table")
       )
     )
   )
