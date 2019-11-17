@@ -58,7 +58,7 @@ mod_spatial_ui <- function(id) {
         fluidRow(
           leafletOutput(
             ns("mymap"),
-            height = "240px"
+            height = "400px"
           )
         ),
         fluidRow(
@@ -115,39 +115,39 @@ mod_spatial_server <- function(input, output, session, data) {
     ) %>%
       addProviderTiles(
         input$mapTexture
-        ) %>%
+      ) %>%
       addCircles(
         ~ decimalLongitude,
-       ~ decimalLatitude,
-       color = input$mapColor
+        ~ decimalLatitude,
+        color = input$mapColor
       ) %>%
       fitBounds(
         ~min(decimalLongitude),
         ~min(decimalLatitude),
         ~max(decimalLongitude),
         ~max(decimalLatitude)
-     ) %>%
-     leaflet.extras::addDrawToolbar(
-       targetGroup='draw',
-       polylineOptions = FALSE,
-       circleOptions = FALSE,
-       markerOptions = FALSE,
-       rectangleOptions = FALSE,
-       circleMarkerOptions = FALSE,
-       editOptions = leaflet.extras::editToolbarOptions()
-     ) %>%
-     addLayersControl(
-       overlayGroups = c('draw'),
-       options = layersControlOptions(
-         collapsed=FALSE
-       )
-     ) 
+      ) %>%
+      leaflet.extras::addDrawToolbar(
+        targetGroup='draw',
+        polylineOptions = FALSE,
+        circleOptions = FALSE,
+        markerOptions = FALSE,
+        rectangleOptions = FALSE,
+        circleMarkerOptions = FALSE,
+        editOptions = leaflet.extras::editToolbarOptions()
+      ) %>%
+      addLayersControl(
+        overlayGroups = c('draw'),
+        options = layersControlOptions(
+          collapsed=FALSE
+        )
+      ) 
   })
-      
+  
   output$table <- DT::renderDataTable({
-   data()[input$show_vars]
+    data()[input$show_vars]
   })
-      
+  
   observeEvent(
     input$mymap_draw_new_feature,
     {
@@ -158,44 +158,44 @@ mod_spatial_server <- function(input, output, session, data) {
             "decimalLongitude"
           )]
         )
-      cities_coordinates <- SpatialPointsDataFrame(
-        data[,c(
-          "decimalLongitude",
-          "decimalLatitude"
-        )],
-        data
-      )
-      
-      #get the coordinates of the polygon
-      polygon_coordinates <- 
-        input$mymap_draw_new_feature$geometry$coordinates[[1]]
-      
-      #transform them to an sp Polygon
-      drawn_polygon <- 
-        Polygon(
-          do.call(
-            rbind,
-            lapply(
-              polygon_coordinates,
-              function(x){c(x[[1]][1],x[[2]][1])}
+        cities_coordinates <- SpatialPointsDataFrame(
+          data[,c(
+            "decimalLongitude",
+            "decimalLatitude"
+          )],
+          data
+        )
+        
+        #get the coordinates of the polygon
+        polygon_coordinates <- 
+          input$mymap_draw_new_feature$geometry$coordinates[[1]]
+        
+        #transform them to an sp Polygon
+        drawn_polygon <- 
+          Polygon(
+            do.call(
+              rbind,
+              lapply(
+                polygon_coordinates,
+                function(x){c(x[[1]][1],x[[2]][1])}
+              )
             )
           )
-        )
-
-      #use over from the sp package to identify selected cities
-      selected_cities <- 
-        cities_coordinates %over% 
-        SpatialPolygons(
-          list(
-            Polygons(
-              list(
-                drawn_polygon
-              ),
-              "drawn_polygon"
+        
+        #use over from the sp package to identify selected cities
+        selected_cities <- 
+          cities_coordinates %over% 
+          SpatialPolygons(
+            list(
+              Polygons(
+                list(
+                  drawn_polygon
+                ),
+                "drawn_polygon"
+              )
             )
           )
-        )
-      
+        
         #print the name of the cities
         geo <- as.data.frame(
           data()[which(
@@ -212,7 +212,7 @@ mod_spatial_server <- function(input, output, session, data) {
       })
     }
   )
-      
+  
   observeEvent(
     input$mymap_draw_deleted_features,
     {
