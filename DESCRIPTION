@@ -43,9 +43,16 @@ Imports:
     shinydashboard,
     sp,
     testthat,
-    tidyr
+    tidyr,
+    gtools,
+    rgdal,
+    summarytools,
+    treemap,
+    bdutilities.app,
+    bdvis,
+    dashboardthemes
 Remotes: 
-    bd-R/bddwc.app,
+    bd-R/bdutilities.app,
     bd-R/bdvis,
     nik01010/dashboardthemes
 RoxygenNote: 6.1.1
