@@ -28,13 +28,10 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Imports: 
-    data.tree,
     dplyr,
     DT,
     flexdashboard,
     formattable,
-    ggplot2,
-    ggpubr,
     golem,
     leaflet,
     leaflet.extras,
@@ -42,21 +39,13 @@ Imports:
     shiny,
     shinydashboard,
     sp,
-    testthat,
-    tidyr,
-    gtools,
-    rgdal,
-    summarytools,
-    treemap,
-    bdutilities.app,
-    bdvis,
+    bdutilities.app (>= 0.0.1),
     dashboardthemes
 Remotes: 
     bd-R/bdutilities.app,
-    bd-R/bdvis,
     nik01010/dashboardthemes
 RoxygenNote: 6.1.1
 URL: https://github.com/tom-gu/dashboard.demo
 BugReports: https://github.com/tom-gu/dashboard.demo/issues
 Suggests: 
-    testthat (>= 2.1.0)
+    testthat
