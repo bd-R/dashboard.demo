@@ -7,6 +7,6 @@ USER ${NB_USER}
 
 
 
-RUN wget https://github.com/tom-gu/dashboard.demo/raw/master/DESCRIPTION && R -e "options(repos = list(CRAN = 'http://mran.revolutionanalytics.com/snapshot/2019-11-16/')); devtools::install_deps(); devtools::install_github('tom-gu/dashboard.demo') "
+RUN wget https://github.com/tom-gu/dashboard.demo/raw/master/DESCRIPTION && R -e "options(repos = list(CRAN = 'http://mran.revolutionanalytics.com/snapshot/2019-11-16/')); devtools::install_deps(); devtools::install_github('tom-gu/dashboard.demo'); library(dashboard.demo); dashboard.demo::run_app() "
 
 RUN rm DESCRIPTION.1; exit 0
