@@ -52,7 +52,7 @@ Remotes:
     bd-R/bdvis,
     nik01010/dashboardthemes
 RoxygenNote: 6.1.1
-URL: https://github.com/bd-R/dashboard.demo
-BugReports: https://github.com/bd-R/dashboard.demo/issues
+URL: https://github.com/tom-gu/dashboard.demo
+BugReports: https://github.com/tom-gu/dashboard.demo/issues
 Suggests: 
     testthat (>= 2.1.0)
