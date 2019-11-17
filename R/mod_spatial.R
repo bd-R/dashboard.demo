@@ -84,8 +84,7 @@ mod_spatial_ui <- function(id) {
             multiple = TRUE,
             selected = c(
               "scientificName",
-              "kingdom", 
-              "phylum"
+              "basisOfRecord"
             )
           )
         ),
