@@ -1,5 +1,5 @@
 #' @import shiny
-
+#' @import bddwc.app
 
 app_server <- function(input, output, session) {
   
