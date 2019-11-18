@@ -69,7 +69,8 @@ mod_spatial_ui <- function(id) {
           "depth",
           "depthAccuracy",
           "establishmentMeans",
-          "basisOfRecord"
+          "basisOfRecord",
+          "datasetName"
         ),
         multiple = TRUE,
         selected = c(
@@ -131,9 +132,9 @@ mod_spatial_server <- function(input, output, session, data) {
       ) 
   })
   
-  output$table <- DT::renderDataTable({
-    data()[input$show_vars]
-  })
+  output$table <- DT::renderDataTable(
+    data()[input$show_vars], filter = list(position = 'top', clear = FALSE)
+  )
   
   observeEvent(
     input$mymap_draw_new_feature,
@@ -203,9 +204,9 @@ mod_spatial_server <- function(input, output, session, data) {
   observeEvent(
     input$mymap_draw_deleted_features,
     {
-      output$table <- DT::renderDataTable({
-        data()[input$show_vars]
-      })
+      output$table <- DT::renderDT(
+        data()[input$show_vars], filter = list(position = 'top', clear = FALSE)
+      )
     }
   )
   
