@@ -1,11 +1,13 @@
 #' @import shiny
-options(shiny.maxRequestSize = 5000 * 1024 ^ 2)
+#' @import bddwc.app
 
 app_server <- function(input, output, session) {
-
+  
+  options(shiny.maxRequestSize = 5000 * 1024 ^ 2)
+  
   inputDataset <-
     callModule(
-      bddwc.app::mod_add_data_server,
+      bdutilities.app::mod_add_data_server,
       id = "bdFileInput"
     )
 

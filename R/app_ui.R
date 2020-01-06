@@ -1,7 +1,7 @@
-#' @import shiny shinydashboard leaflet dplyr dashboardthemes ggpubr plotly
-#' @import data.tree flexdashboard bdvis ggplot2 tidyr treemap
-#' @import formattable summarytools leaflet.extras sp bddwc.app
-
+#' @import shiny shinydashboard leaflet dplyr dashboardthemes plotly
+#' @import flexdashboard DT
+#' @import formattable leaflet.extras sp bdutilities.app
+#' 
 app_ui <- function() {
   dashboardPage(
     skin = "green",
@@ -51,7 +51,7 @@ app_ui <- function() {
       tabItems(
         tabItem(
           tabName = "dataInputTab",
-          bddwc.app::mod_add_data_ui("bdFileInput")
+          bdutilities.app::mod_add_data_ui("bdFileInput")
         ),
         tabItem(
           tabName = "dataSummary",
