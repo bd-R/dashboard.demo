@@ -96,6 +96,9 @@ mod_spatial_server <- function(input, output, session, data) {
   ns <- session$ns
   
   output$mymap <- renderLeaflet({
+    validate(
+      need(length(data())>0, 'Please upload/download a dataset first')
+    )
     leaflet(
       data = na.omit(
         data()[c("decimalLatitude", "decimalLongitude")]
@@ -132,8 +135,11 @@ mod_spatial_server <- function(input, output, session, data) {
       ) 
   })
   
-  output$table <- DT::renderDataTable(
-    data()[input$show_vars], filter = list(position = 'top', clear = FALSE)
+  output$table <- DT::renderDataTable({
+    validate(
+      need(length(data())>0, 'Please upload/download a dataset first')
+    )
+    data()[input$show_vars]}, filter = list(position = 'top', clear = FALSE)
   )
   
   observeEvent(

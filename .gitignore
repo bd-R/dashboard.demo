@@ -3,3 +3,8 @@
 .RData
 .Ruserdata
 dashboard.demo-tomer.Rproj
+.DS_Store
+mammals.csv
+hyenaData.csv
+sampledata.csv
+data
