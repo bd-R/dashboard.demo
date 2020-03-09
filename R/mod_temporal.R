@@ -114,6 +114,9 @@ mod_temporal_server <- function(input, output, session, data_temporal){
   selectionsbar <- reactiveVal()
     
   output$bar <- renderPlotly({
+    validate(
+      need(length(data_temporal())>0, 'Please upload/download a dataset first')
+    )
     if (length(selectionsbar()) == 0){
       plot_ly(
         data = data_temporal(),
@@ -223,6 +226,9 @@ mod_temporal_server <- function(input, output, session, data_temporal){
 
   #Violin Plot
   output$violin <- renderPlotly({
+    validate(
+      need(length(data_temporal())>0, 'Please upload/download a dataset first')
+    )
   df <- data_temporal()
   
   if(is.null(selectionsbar())){
@@ -327,6 +333,9 @@ mod_temporal_server <- function(input, output, session, data_temporal){
   selections <- reactiveVal()
     
   output$time <- renderPlotly({
+    validate(
+      need(length(data_temporal())>0, 'Please upload/download a dataset first')
+    )
     if (length(selections()) == 0) {
       count(
         data_temporal(),

@@ -182,6 +182,9 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
   ns <- session$ns
   
   output$gauge_one <- flexdashboard::renderGauge({
+    validate(
+      need(length(dataset())>0, 'Please upload/download a dataset first')
+    )
     df <- dataset()
   
     latitude <- round(
@@ -237,6 +240,9 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
   })
     
   output$gauge_two <- flexdashboard::renderGauge({
+    validate(
+      need(length(dataset())>0, 'Please upload/download a dataset first')
+    )
     df <- dataset()
     
     countryRecord <- round(
@@ -270,6 +276,9 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
   })
     
   output$gauge_three <- flexdashboard::renderGauge({
+    validate(
+      need(length(dataset())>0, 'Please upload/download a dataset first')
+    )
     df <- dataset()
       
     institutionCode <- round(
@@ -303,6 +312,9 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
   })
     
   output$gauge_four <- flexdashboard::renderGauge({
+    validate(
+      need(length(dataset())>0, 'Please upload/download a dataset first')
+    )
     df <- dataset()
     
     basisOfRecord <- round(
@@ -338,6 +350,9 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
     
 
   output$box_a <- shinydashboard::renderValueBox({
+    validate(
+      need(length(dataset())>0, 'Please upload/download a dataset first')
+    )
     shinydashboard::valueBox(
       value = (nrow(dataset()["decimalLatitude"])),
       subtitle = "# of Records",
@@ -348,6 +363,9 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
   })
     
   output$box_b <-  shinydashboard::renderValueBox({
+    validate(
+      need(length(dataset())>0, 'Please upload/download a dataset first')
+    )
     shinydashboard::valueBox(
       value = nrow(unique(dataset()["scientificName"])),
       subtitle = "# of Taxa",
@@ -358,6 +376,9 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
   })
     
   output$box_c <-  shinydashboard::renderValueBox({
+    validate(
+      need(length(dataset())>0, 'Please upload/download a dataset first')
+    )
     shinydashboard::valueBox(
       value = length(dataset()),
       subtitle = "# of Attributes",
@@ -371,6 +392,9 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
     
   #Spatial.......................................
   output$geo_coordinates <- shinydashboard::renderInfoBox({
+    validate(
+      need(length(dataset())>0, 'Please upload/download a dataset first')
+    )
     latitude <- nrow(
       (
         na.omit(
@@ -401,6 +425,9 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
   })
     
   output$country_code <- shinydashboard::renderInfoBox({
+    validate(
+      need(length(dataset())>0, 'Please upload/download a dataset first')
+    )
     shinydashboard::infoBox(
       "# of Countries",
       nrow(
@@ -417,6 +444,9 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
   })
     
   output$locality <- shinydashboard::renderInfoBox({
+    validate(
+      need(length(dataset())>0, 'Please upload/download a dataset first')
+    )
     shinydashboard::infoBox(
       "# of Localities",
       nrow(
@@ -433,6 +463,9 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
   })
     
   output$coordinate_uncertainty <- shinydashboard::renderInfoBox({
+    validate(
+      need(length(dataset())>0, 'Please upload/download a dataset first')
+    )
     shinydashboard::infoBox(
       "# of coordinateUncertaintyInMeters",
       nrow(
@@ -450,6 +483,9 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
     
   #Temporal.......................................
   output$start_year <- shinydashboard::renderInfoBox({
+    validate(
+      need(length(dataset())>0, 'Please upload/download a dataset first')
+    )
     shinydashboard::infoBox(
       "Starting Year",
       min(
@@ -468,6 +504,9 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
   })
     
   output$end_year <- shinydashboard::renderInfoBox({
+    validate(
+      need(length(dataset())>0, 'Please upload/download a dataset first')
+    )
     shinydashboard::infoBox(
       "End Year",
       max(
@@ -488,6 +527,9 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
     
   #Taxonomic.......................................
   output$kingdom <- shinydashboard::renderInfoBox({
+    validate(
+      need(length(dataset())>0, 'Please upload/download a dataset first')
+    )
     shinydashboard::infoBox(
       "# of Kingdom",
       nrow(
@@ -504,6 +546,9 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
   })
     
   output$phylum <- shinydashboard::renderInfoBox({
+    validate(
+      need(length(dataset())>0, 'Please upload/download a dataset first')
+    )
     shinydashboard::infoBox(
       "# of Phylum",
       nrow(
@@ -520,6 +565,9 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
   })
     
   output$order <- shinydashboard::renderInfoBox({
+    validate(
+      need(length(dataset())>0, 'Please upload/download a dataset first')
+    )
     shinydashboard::infoBox(
       "# of Order",
       nrow(
@@ -536,6 +584,9 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
   })
     
   output$family <- shinydashboard::renderInfoBox({
+    validate(
+      need(length(dataset())>0, 'Please upload/download a dataset first')
+    )
     shinydashboard::infoBox(
       "# of Family",
       nrow(
@@ -552,6 +603,9 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
   })
     
   output$genus <- shinydashboard::renderInfoBox({
+    validate(
+      need(length(dataset())>0, 'Please upload/download a dataset first')
+    )
     shinydashboard::infoBox(
       "# of Genus",
       nrow(
@@ -568,6 +622,9 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
   })
     
   output$species <- shinydashboard::renderInfoBox({
+    validate(
+      need(length(dataset())>0, 'Please upload/download a dataset first')
+    )
     shinydashboard::infoBox(
       "# of Species",
       nrow(

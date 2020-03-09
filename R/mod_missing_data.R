@@ -51,6 +51,9 @@ mod_missing_data_server <- function(input, output, session, dataset_missing) {
   ns <- session$ns
   #Calculating missing data and create the table for spatial Tab
   output$spatial_table <- formattable::renderFormattable({
+    validate(
+      need(length(dataset_missing())>0, 'Please upload/download a dataset first')
+    )
     df <- dataset_missing()
     names <- vector()
     total_records <- vector()
@@ -144,6 +147,9 @@ mod_missing_data_server <- function(input, output, session, dataset_missing) {
   
   #Calculating missing data and create the table for Temporal Tab  
   output$temporal_table <- formattable::renderFormattable({
+    validate(
+      need(length(dataset_missing())>0, 'Please upload/download a dataset first')
+    )
     df <- dataset_missing()
     names <- vector()
     total_records <- vector()
@@ -232,6 +238,9 @@ mod_missing_data_server <- function(input, output, session, dataset_missing) {
     
   #Calculating missing data and create the table for Taxonomic Tab
   output$taxonomic_table <- formattable::renderFormattable({
+    validate(
+      need(length(dataset_missing())>0, 'Please upload/download a dataset first')
+    )
     df <- dataset_missing()
     names <- vector()
     total_records <- vector()
