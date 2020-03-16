@@ -40,6 +40,10 @@ app_ui <- function() {
           "Temporal Visualization",
           tabName = "temporalTab",
           icon = icon("clock")
+        ),
+        menuItem("Cite Us",
+                 tabName = "cite",
+                 icon = icon("copyright")
         )
       )
     ),
@@ -73,6 +77,13 @@ app_ui <- function() {
         tabItem(
           tabName = "temporalTab",
           mod_temporal_ui("temporal_ui")
+        ),
+        tabItem("cite",
+          fluidRow(
+            div(
+              bdutilities.app::mod_citation_ui("bdcite", "bdchecks.app")
+            )
+          )
         )
       )
     )
