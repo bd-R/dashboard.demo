@@ -40,11 +40,10 @@ Imports:
     shinydashboard,
     sp,
     bdutilities.app (>= 0.0.1),
-    bddwc.app (>= 0.0.5),
+    bdclean,
     dashboardthemes
 Remotes: 
     bd-R/bdutilities.app,
-    bd-R/bddwc.app,
     nik01010/dashboardthemes
 RoxygenNote: 7.0.2
 URL: https://github.com/bd-R/dashboard.demo
