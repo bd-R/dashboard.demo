@@ -57,6 +57,10 @@ body, .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6, .main-header .logo {
     background-color: orange;
 }
 
+#darwinize-darwinizeButton {
+  background-color: orange;
+}
+
 .completedButton .btn{
     background-color: green;
     color: white
@@ -121,6 +125,8 @@ body, .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6, .main-header .logo {
 .activeButton .btn{
     background-color: orange;
 }
+
+
 #nextButton .btn{
   color: #fff;
   background-color: #379a6d;

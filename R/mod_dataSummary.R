@@ -74,7 +74,7 @@ mod_dataSummary_ui <- function(id) {
         style = 'padding:20px;',
         tabsetPanel(
           tabPanel(
-            "spatial", br(),
+            "Spatial", br(),
             fluidRow(
               column(
                 4,
