@@ -24,4 +24,10 @@ app_server <- function(input, output, session) {
   callModule(mod_taxonomic_server, "taxonomic_ui", darwinized_data)
 
   callModule(mod_temporal_server, "temporal_ui", darwinized_data)
+  
+  callModule(
+    bdutilities.app::mod_citation_server,
+    id = "bdcite",
+    package = "bdchecks.app"
+  )
 }
