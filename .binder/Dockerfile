@@ -1,4 +1,4 @@
-FROM rocker/binder:3.6.0
+FROM bdverse/bdverse-binder:2020-03-15
 LABEL maintainer='Tomer Gueta'
 USER root
 COPY . ${HOME}
@@ -6,7 +6,9 @@ RUN chown -R ${NB_USER} ${HOME}
 USER ${NB_USER}
 
 
-
-RUN wget https://github.com/bd-R/dashboard.demo/raw/master/DESCRIPTION && R -e "options(repos = list(CRAN = 'http://mran.revolutionanalytics.com/snapshot/2019-11-16/')); devtools::install_deps(); devtools::install_github('bd-R/dashboard.demo')"
+RUN wget https://github.com/bd-R/bdverse/raw/master/DESCRIPTION && R -e "options(repos = list(CRAN = 'https://mran.microsoft.com/snapshot/2020-03-15/')); \
+devtools::install_deps(upgrade = 'never'); \
+devtools::install_github('bd-R/bdverse'); \
+devtools::install_github('bd-R/dashboard.demo')"
 
 RUN rm DESCRIPTION.1; exit 0
