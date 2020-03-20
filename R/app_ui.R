@@ -5,7 +5,7 @@
 app_ui <- function() {
   dashboardPage(
     skin = "yellow",
-    dashboardHeader(title = "bdvis Dashboard"),
+    dashboardHeader(title = "bddashboard Demo"),
     dashboardSidebar(
       sidebarMenu(
         id = "sideBar",
