@@ -3,6 +3,8 @@
 
 app_server <- function(input, output, session) {
   
+  session$onSessionEnded(stopApp)
+  
   options(shiny.maxRequestSize = 5000 * 1024 ^ 2)
   
   data_input <- 
