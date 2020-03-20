@@ -81,7 +81,7 @@ app_ui <- function() {
         tabItem("cite",
           fluidRow(
             div(
-              bdutilities.app::mod_citation_ui("bdcite", "bdchecks.app")
+              bdutilities.app::mod_citation_ui("bdcite", "dashboard.demo")
             )
           )
         )
