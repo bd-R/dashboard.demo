@@ -1,7 +1,7 @@
 Package: dashboard.demo
-Title: Dashboard For biodiversity data visualization
-Version: 0.1.3
-Date: 23-09-2019
+Title: Dashboard Demo for Biodiversity Data Visualization
+Version: 0.1.4
+Date: 20-03-2020
 Authors@R: c(
     person(
         "Rahul", "Chauhan",
@@ -13,14 +13,14 @@ Authors@R: c(
         role = c("aut"),
         comment = c(ORCID = '0000-0003-1557-8596')),
     person(
+        "Thiloshon", "Nagarajah",
+        email = "thiloshon@gmail.com",
+        role = c("aut")),
+    person(
         "Vijay", "Barve", ,
         email = "vijay.barve@gmail.com", 
         role = c("aut"),
-        comment = c(ORCID = '0000-0002-4852-2567')),
-    person(
-        "Thiloshon", "Nagarajah",
-        email = "thiloshon@gmail.com",
-        role = c("aut"))
+        comment = c(ORCID = '0000-0002-4852-2567'))
     )
 Maintainer: Rahul Chauhan <rahul.chauhan049@gmail.com>
 Description: Provides visualizations of biodiversity data. This is an easy to use shiny dashboard which allows visualizing different aspect of biodiversity like temporal, taxonomic and spatial.
