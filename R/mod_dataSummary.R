@@ -230,7 +230,7 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
       min = 0,
       max = 100,
       symbol = "%",
-      label = "% of Plotable\nGeo coordinates",
+      label = "% of georeferenced \nrecords",
       gaugeSectors(
         success = c(80, 100),
         warning = c(40, 79),
@@ -266,7 +266,7 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
       min = 0,
       max = 100,
       symbol = "%",
-      label = "% of rows\nwith dateIdentified records",
+      label = "% of records\nwith date data",
       gaugeSectors(
         success = c(80, 100),
         warning = c(40, 79),
@@ -302,7 +302,7 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
       min = 0,
       max = 100,
       symbol = "%",
-      label = "% of rows\nwith occurence remark",
+      label = "% of records\nwith occurence remark",
       gaugeSectors(
         success = c(80, 100),
         warning = c(40, 79),
@@ -338,7 +338,7 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
       min = 0,
       max = 100,
       symbol = "%",
-      label = "% of rows\nwith eventTime records",
+      label = "% of records\nwith eventTime data",
       gaugeSectors(
         success = c(80, 100),
         warning = c(40, 79),
@@ -419,7 +419,7 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
         latitude
       },
       icon = icon("compass"),
-      color = "red",
+      color = "navy",
       width = 4
     )
   })
@@ -457,7 +457,7 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
         )
       ),
       icon = icon("street-view"),
-      color = "yellow",
+      color = "navy",
       width = 4
     )
   })
@@ -476,11 +476,12 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
         )
       ),
       icon = icon("compass"),
-      color = "teal",
+      color = "navy",
       width = 4
     )
   })
     
+  
   #Temporal.......................................
   output$start_year <- shinydashboard::renderInfoBox({
     validate(
@@ -498,7 +499,7 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
         )
       ),
       icon = icon("stripe-s"),
-      color = "teal",
+      color = "olive",
       width = 6
     )
   })
@@ -519,7 +520,7 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
         )
       ),
       icon = icon("etsy"),
-      color = "navy",
+      color = "olive",
       width = 6
     )
   })
@@ -540,7 +541,7 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
         )
       ),
       icon = icon("korvue"),
-      color = "red",
+      color = "teal",
       width = 4
     )
   })
@@ -559,7 +560,7 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
         )
       ),
       icon = icon("product-hunt"),
-      color = "orange",
+      color = "teal",
       width = 4
     )
   })
@@ -578,7 +579,7 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
         )
       ),
       icon = icon("opera"),
-      color = "green",
+      color = "teal",
       width = 4
     )
   })
@@ -597,7 +598,7 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
         )
       ),
       icon = icon("facebook-f"),
-      color = "navy",
+      color = "teal",
       width = 4
     )
   })
@@ -616,7 +617,7 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
         )
       ),
       icon = icon("gofore"),
-      color = "yellow",
+      color = "teal",
       width = 4
     )
   })
