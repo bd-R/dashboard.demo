@@ -16,7 +16,7 @@ app_ui <- function() {
         ),
         menuItem(
           "Data Overview",
-          icon = icon("database"),
+          icon = icon("eye"),
           menuSubItem(
             "Data Summary",
             tabName = "dataSummary"
@@ -34,16 +34,16 @@ app_ui <- function() {
         menuItem(
           "Taxonomic Visualization",
           tabName = "taxonomicTab",
-          icon = icon("connectdevelop")
+          icon = icon("sitemap")
         ),
         menuItem(
           "Temporal Visualization",
           tabName = "temporalTab",
           icon = icon("clock")
         ),
-        menuItem("Cite Us",
+        menuItem("Citations",
                  tabName = "cite",
-                 icon = icon("copyright")
+                 icon = icon("university")
         )
       )
     ),
