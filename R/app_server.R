@@ -28,6 +28,6 @@ app_server <- function(input, output, session) {
   callModule(
     bdutilities.app::mod_citation_server,
     id = "bdcite",
-    package = "bdchecks.app"
+    package = "dashboard.demo"
   )
 }

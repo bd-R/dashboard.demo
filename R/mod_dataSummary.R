@@ -16,6 +16,7 @@
 mod_dataSummary_ui <- function(id) {
   ns <- NS(id)
   fluidPage(
+    
     fluidRow(
       style = 'padding-bottom:0px;',
       column(
@@ -182,22 +183,36 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
   ns <- session$ns
   
   output$gauge_one <- flexdashboard::renderGauge({
+    dat <- dataset()
+    if("verbatimLatitude" %in% colnames(dat))
+    {
+      latitudeName <- "verbatimLatitude"
+    }else {
+      latitudeName <- "decimalLatitude"
+    }
+    
+    if("verbatimLongitude" %in% colnames(dat))
+    {
+      longitudeName <- "verbatimLongitude"
+    }else {
+      longitudeName <- "decimalLatitude"
+    }
     validate(
       need(length(dataset())>0, 'Please upload/download a dataset first')
     )
     df <- dataset()
-  
+
     latitude <- round(
       (
         (
           nrow(
-            df["decimalLatitude"]) - sum(
+            df[latitudeName]) - sum(
               is.na(
-                df["decimalLatitude"]
+                df[latitudeName]
               )
             )
         ) / nrow(
-          df["decimalLatitude"]
+          df[latitudeName]
         )
       ),
       2
@@ -207,13 +222,13 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
       (
         (
           nrow(
-            df["decimalLongitude"]) - sum(
+            df[latitudeName]) - sum(
               is.na(
-                df["decimalLongitude"]
+                df[latitudeName]
               )
             )
         ) / nrow(
-          df["decimalLongitude"]
+          df[latitudeName]
         )
       ),
       2
@@ -350,11 +365,12 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
     
 
   output$box_a <- shinydashboard::renderValueBox({
+    
     validate(
       need(length(dataset())>0, 'Please upload/download a dataset first')
     )
     shinydashboard::valueBox(
-      value = (nrow(dataset()["decimalLatitude"])),
+      value = (nrow(dataset())),
       subtitle = "# of Records",
       icon = icon("compass"),
       color = "aqua",
@@ -367,7 +383,7 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
       need(length(dataset())>0, 'Please upload/download a dataset first')
     )
     shinydashboard::valueBox(
-      value = nrow(unique(dataset()["scientificName"])),
+      value = nrow(unique(dataset()["name"])),
       subtitle = "# of Taxa",
       icon = icon("file-signature"),
       color = "blue",
@@ -392,13 +408,27 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
     
   #Spatial.......................................
   output$geo_coordinates <- shinydashboard::renderInfoBox({
+    dat <- dataset()
+    if("verbatimLatitude" %in% colnames(dat))
+    {
+      latitudeName <- "verbatimLatitude"
+    }else {
+      latitudeName <- "decimalLatitude"
+    }
+    
+    if("verbatimLongitude" %in% colnames(dat))
+    {
+      longitudeName <- "verbatimLongitude"
+    }else {
+      longitudeName <- "decimalLatitude"
+    }
     validate(
       need(length(dataset())>0, 'Please upload/download a dataset first')
     )
     latitude <- nrow(
       (
         na.omit(
-          dataset()["decimalLatitude"]
+          dataset()[latitudeName]
         )
       )
     )
@@ -406,7 +436,7 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
     longitude <- nrow(
       (
         na.omit(
-          dataset()["decimalLongitude"]
+          dataset()[longitudeName]
         )
       )
     )
