@@ -4,8 +4,8 @@
 #' 
 app_ui <- function() {
   dashboardPage(
-    skin = "green",
-    dashboardHeader(title = "bdvis Dashboard"),
+    skin = "yellow",
+    dashboardHeader(title = "bddashboard Demo"),
     dashboardSidebar(
       sidebarMenu(
         id = "sideBar",
@@ -16,7 +16,7 @@ app_ui <- function() {
         ),
         menuItem(
           "Data Overview",
-          icon = icon("database"),
+          icon = icon("eye"),
           menuSubItem(
             "Data Summary",
             tabName = "dataSummary"
@@ -34,16 +34,16 @@ app_ui <- function() {
         menuItem(
           "Taxonomic Visualization",
           tabName = "taxonomicTab",
-          icon = icon("connectdevelop")
+          icon = icon("sitemap")
         ),
         menuItem(
           "Temporal Visualization",
           tabName = "temporalTab",
           icon = icon("clock")
         ),
-        menuItem("Cite Us",
+        menuItem("Citations",
                  tabName = "cite",
-                 icon = icon("copyright")
+                 icon = icon("university")
         )
       )
     ),
@@ -81,7 +81,7 @@ app_ui <- function() {
         tabItem("cite",
           fluidRow(
             div(
-              bdutilities.app::mod_citation_ui("bdcite", "bdchecks.app")
+              bdutilities.app::mod_citation_ui("bdcite", "dashboard.demo")
             )
           )
         )
