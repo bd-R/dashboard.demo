@@ -22,16 +22,7 @@ mod_temporal_ui <- function(id) {
         selectInput(
           ns("bar_select"),
           "Select Column to be displayed",
-          c(
-            "basisOfRecord",
-            "kingdom",
-            "phylum",
-            "order",
-            "family",
-            "genus",
-            "species"
-          ),
-          selected = "basisOfRecord"
+          choices = NULL
         ),
         uiOutput(
           ns("back_bar")
@@ -66,16 +57,7 @@ mod_temporal_ui <- function(id) {
         selectInput(
           ns("timeselect"),
           "Select Column to be displayed",
-          c(
-            "basisOfRecord" = "1",
-            "kingdom" = "2",
-            "phylum" = "3",
-            "order" = "4",
-            "family" = "5",
-            "genus" = "6",
-            "species" = "7"
-            ),
-            selected = "1"
+          choices = NULL
           )
         ),
       column(
@@ -110,6 +92,71 @@ mod_temporal_ui <- function(id) {
 mod_temporal_server <- function(input, output, session, data_temporal){
   ns <- session$ns
   
+  observe({
+    choices = c(
+      "basisOfRecord",
+      "kingdom",
+      "phylum",
+      "order",
+      "family",
+      "genus",
+      "species",
+      "name",
+      "missing_name",
+      "scientificName",
+      "identifiedBy",
+      "recordNumber",
+      "typeStatus"
+    )
+    
+    column_names <- vector()
+    for(i in choices){
+      if(i %in% colnames(data_temporal())){
+        column_names <- c(column_names, i)
+      }
+    }
+    
+    # Can also set the label and select items
+    updateSelectInput(session, "bar_select",
+                      "Select columns to show:",
+                      choices = column_names,
+                      selected = tail(column_names, 1)
+    )
+  })
+  
+  observe({
+    choices = c(
+      "basisOfRecord",
+      "kingdom",
+      "phylum",
+      "order",
+      "family",
+      "genus",
+      "species",
+      "name",
+      "missing_name",
+      "scientificName",
+      "identifiedBy",
+      "recordNumber",
+      "typeStatus"
+    )
+    
+    column_names <- vector()
+    for(i in choices){
+      if(i %in% colnames(data_temporal())){
+        column_names <- c(column_names, i)
+      }
+    }
+    
+    # Can also set the label and select items
+    updateSelectInput(session, "timeselect",
+                      "Select columns to show:",
+                      choices = column_names,
+                      selected = tail(column_names, 1)
+    )
+  })
+  
+  
   #Plot bar graph.
   selectionsbar <- reactiveVal()
     
@@ -128,7 +175,13 @@ mod_temporal_server <- function(input, output, session, data_temporal){
           "order"  = ~order,
           "family" = ~family,
           "genus" = ~genus,
-          "species" = ~species
+          "species" = ~species,
+          "name" = ~name,
+          "missing_name" = ~missing_name,
+          "scientificName" = ~scientificName,
+          "identifiedBy" = ~identifiedBy,
+          "recordNumber" = ~recordNumber,
+          "typeStatus" = ~typeStatus
         ),
         source = "bar_selected"
       ) %>%
@@ -160,7 +213,13 @@ mod_temporal_server <- function(input, output, session, data_temporal){
               "order"  = order,
               "family" = family,
               "genus" = genus,
-              "species" = species
+              "species" = species,
+              "name" = name,
+              "missing_name" = missing_name,
+              "scientificName" = scientificName,
+              "identifiedBy" = identifiedBy,
+              "recordNumber" = recordNumber,
+              "typeStatus" = typeStatus
               ) %in% 
               selectionsbar()
           ) %>%
@@ -173,7 +232,13 @@ mod_temporal_server <- function(input, output, session, data_temporal){
               "order"  = ~order,
               "family" = ~family,
               "genus" = ~genus,
-              "species" = ~species
+              "species" = ~species,
+              "name" = ~name,
+              "missing_name" = ~missing_name,
+              "scientificName" = ~scientificName,
+              "identifiedBy" = ~identifiedBy,
+              "recordNumber" = ~recordNumber,
+              "typeStatus" = ~typeStatus
             ),
             source = "bar_selected"
           ) %>%
@@ -224,12 +289,78 @@ mod_temporal_server <- function(input, output, session, data_temporal){
   # clear the chosen category on back button press
   observeEvent(input$clear_bar, selectionsbar(NULL))
 
+  
   #Violin Plot
   output$violin <- renderPlotly({
     validate(
       need(length(data_temporal())>0, 'Please upload/download a dataset first')
     )
   df <- data_temporal()
+  year <- ""
+  month <- ""
+  day <- ""
+  
+  
+  if('year' %in% colnames(df)){
+    if('month' %in% colnames(df)){
+      if('day' %in% colnames(df)){
+        
+      }
+      else if('begin_date' %in% colnames(df)){
+        df["year"] <- as.data.frame(as.integer(substr((df$begin_date),1,4)))
+        df["month"] <- as.data.frame(as.integer(substr((df$begin_date),6,7)))
+        df["day"] <- as.data.frame(as.integer(substr((df$begin_date),9,10)))
+      } else if('date' %in% colnames(df)){
+        df["year"] <- as.data.frame(as.integer(substr((df$date),1,4)))
+        df["month"] <- as.data.frame(as.integer(substr((df$date),6,7)))
+        df["day"] <- as.data.frame(as.integer(substr((df$date),9,10)))
+      } else if('observed_on' %in% colnames(df)){
+        df["year"] <- as.data.frame(as.integer(substr((df$observed_on),1,4)))
+        df["month"] <- as.data.frame(as.integer(substr((df$observed_on),6,7)))
+        df["day"] <- as.data.frame(as.integer(substr((df$observed_on),9,10)))
+      } else if('datecollected' %in% colnames(df)){
+        df["year"] <- as.data.frame(as.integer(substr((df$datecollected),1,4)))
+        df["month"] <- as.data.frame(as.integer(substr((df$datecollected),6,7)))
+        df["day"] <- as.data.frame(as.integer(substr((df$datecollected),9,10)))
+      }
+    } else if('begin_date' %in% colnames(df)){
+      df["year"] <- as.data.frame(as.integer(substr((df$begin_date),1,4)))
+      df["month"] <- as.data.frame(as.integer(substr((df$begin_date),6,7)))
+      df["day"] <- as.data.frame(as.integer(substr((df$begin_date),9,10)))
+    } else if('date' %in% colnames(df)){
+      df["year"] <- as.data.frame(as.integer(substr((df$date),1,4)))
+      df["month"] <- as.data.frame(as.integer(substr((df$date),6,7)))
+      df["day"] <- as.data.frame(as.integer(substr((df$date),9,10)))
+    } else if('observed_on' %in% colnames(df)){
+      df["year"] <- as.data.frame(as.integer(substr((df$observed_on),1,4)))
+      df["month"] <- as.data.frame(as.integer(substr((df$observed_on),6,7)))
+      df["day"] <- as.data.frame(as.integer(substr((df$observed_on),9,10)))
+    } else if('datecollected' %in% colnames(df)){
+      df["year"] <- as.data.frame(as.integer(substr((df$datecollected),1,4)))
+      df["month"] <- as.data.frame(as.integer(substr((df$datecollected),6,7)))
+      df["day"] <- as.data.frame(as.integer(substr((df$datecollected),9,10)))
+    }
+  } else if('begin_date' %in% colnames(df)){
+    df["year"] <- as.data.frame(as.integer(substr((df$begin_date),1,4)))
+    df["month"] <- as.data.frame(as.integer(substr((df$begin_date),6,7)))
+    df["day"] <- as.data.frame(as.integer(substr((df$begin_date),9,10)))
+  } else if('date' %in% colnames(df)){
+    df["year"] <- as.data.frame(as.integer(substr((df$date),1,4)))
+    df["month"] <- as.data.frame(as.integer(substr((df$date),6,7)))
+    df["day"] <- as.data.frame(as.integer(substr((df$date),9,10)))
+  } else if('observed_on' %in% colnames(df)){
+    df["year"] <- as.data.frame(as.integer(substr((df$observed_on),1,4)))
+    df["month"] <- as.data.frame(as.integer(substr((df$observed_on),6,7)))
+    df["day"] <- as.data.frame(as.integer(substr((df$observed_on),9,10)))
+  } else if('datecollected' %in% colnames(df)){
+    df["year"] <- as.data.frame(as.integer(substr((df$datecollected),1,4)))
+    df["month"] <- as.data.frame(as.integer(substr((df$datecollected),6,7)))
+    df["day"] <- as.data.frame(as.integer(substr((df$datecollected),9,10)))
+  } 
+  
+  
+  
+  
   
   if(is.null(selectionsbar())){
     df %>%
@@ -248,7 +379,13 @@ mod_temporal_server <- function(input, output, session, data_temporal){
           "order"  = ~order,
           "family" = ~family,
           "genus" = ~genus,
-          "species" = ~species
+          "species" = ~species,
+          "name" = ~name,
+          "missing_name" = ~missing_name,
+          "scientificName" = ~scientificName,
+          "identifiedBy" = ~identifiedBy,
+          "recordNumber" = ~recordNumber,
+          "typeStatus" = ~typeStatus
         ),
         type = 'violin',
         box = list(
@@ -276,7 +413,8 @@ mod_temporal_server <- function(input, output, session, data_temporal){
         )
       )
   } else {
-    newData <- data_temporal() %>%
+    newData <- df
+    newData %>%
       filter(
         switch(
           input$bar_select,
@@ -286,13 +424,19 @@ mod_temporal_server <- function(input, output, session, data_temporal){
           "order"  = order,
           "family" = family,
           "genus" = genus,
-          "species" = species
+          "species" = species,
+          "name" = name,
+          "missing_name" = missing_name,
+          "scientificName" = scientificName,
+          "identifiedBy" = identifiedBy,
+          "recordNumber" = recordNumber,
+          "typeStatus" = typeStatus
         ) %in% 
           selectionsbar()
       )
-    if(nrow(newData) == 0){
-      newData <- df
-    }
+    # if(nrow(newData) == 0){
+    #   newData <- df
+    # }
     newData %>%
       plot_ly(
         y = switch(
@@ -336,18 +480,87 @@ mod_temporal_server <- function(input, output, session, data_temporal){
     validate(
       need(length(data_temporal())>0, 'Please upload/download a dataset first')
     )
+    df <- data_temporal()
+    year <- ""
+    month <- ""
+    day <- ""
+    
+    
+    if('year' %in% colnames(df)){
+      if('month' %in% colnames(df)){
+        if('day' %in% colnames(df)){
+          
+        }
+        else if('begin_date' %in% colnames(df)){
+          df["year"] <- as.data.frame(as.integer(substr((df$begin_date),1,4)))
+          df["month"] <- as.data.frame(as.integer(substr((df$begin_date),6,7)))
+          df["day"] <- as.data.frame(as.integer(substr((df$begin_date),9,10)))
+        } else if('date' %in% colnames(df)){
+          df["year"] <- as.data.frame(as.integer(substr((df$date),1,4)))
+          df["month"] <- as.data.frame(as.integer(substr((df$date),6,7)))
+          df["day"] <- as.data.frame(as.integer(substr((df$date),9,10)))
+        } else if('observed_on' %in% colnames(df)){
+          df["year"] <- as.data.frame(as.integer(substr((df$observed_on),1,4)))
+          df["month"] <- as.data.frame(as.integer(substr((df$observed_on),6,7)))
+          df["day"] <- as.data.frame(as.integer(substr((df$observed_on),9,10)))
+        } else if('datecollected' %in% colnames(df)){
+          df["year"] <- as.data.frame(as.integer(substr((df$datecollected),1,4)))
+          df["month"] <- as.data.frame(as.integer(substr((df$datecollected),6,7)))
+          df["day"] <- as.data.frame(as.integer(substr((df$datecollected),9,10)))
+        }
+      } else if('begin_date' %in% colnames(df)){
+        df["year"] <- as.data.frame(as.integer(substr((df$begin_date),1,4)))
+        df["month"] <- as.data.frame(as.integer(substr((df$begin_date),6,7)))
+        df["day"] <- as.data.frame(as.integer(substr((df$begin_date),9,10)))
+      } else if('date' %in% colnames(df)){
+        df["year"] <- as.data.frame(as.integer(substr((df$date),1,4)))
+        df["month"] <- as.data.frame(as.integer(substr((df$date),6,7)))
+        df["day"] <- as.data.frame(as.integer(substr((df$date),9,10)))
+      } else if('observed_on' %in% colnames(df)){
+        df["year"] <- as.data.frame(as.integer(substr((df$observed_on),1,4)))
+        df["month"] <- as.data.frame(as.integer(substr((df$observed_on),6,7)))
+        df["day"] <- as.data.frame(as.integer(substr((df$observed_on),9,10)))
+      } else if('datecollected' %in% colnames(df)){
+        df["year"] <- as.data.frame(as.integer(substr((df$datecollected),1,4)))
+        df["month"] <- as.data.frame(as.integer(substr((df$datecollected),6,7)))
+        df["day"] <- as.data.frame(as.integer(substr((df$datecollected),9,10)))
+      }
+    } else if('begin_date' %in% colnames(df)){
+      df["year"] <- as.data.frame(as.integer(substr((df$begin_date),1,4)))
+      df["month"] <- as.data.frame(as.integer(substr((df$begin_date),6,7)))
+      df["day"] <- as.data.frame(as.integer(substr((df$begin_date),9,10)))
+    } else if('date' %in% colnames(df)){
+      df["year"] <- as.data.frame(as.integer(substr((df$date),1,4)))
+      df["month"] <- as.data.frame(as.integer(substr((df$date),6,7)))
+      df["day"] <- as.data.frame(as.integer(substr((df$date),9,10)))
+    } else if('observed_on' %in% colnames(df)){
+      df["year"] <- as.data.frame(as.integer(substr((df$observed_on),1,4)))
+      df["month"] <- as.data.frame(as.integer(substr((df$observed_on),6,7)))
+      df["day"] <- as.data.frame(as.integer(substr((df$observed_on),9,10)))
+    } else if('datecollected' %in% colnames(df)){
+      df["year"] <- as.data.frame(as.integer(substr((df$datecollected),1,4)))
+      df["month"] <- as.data.frame(as.integer(substr((df$datecollected),6,7)))
+      df["day"] <- as.data.frame(as.integer(substr((df$datecollected),9,10)))
+    } 
+    
     if (length(selections()) == 0) {
       count(
-        data_temporal(),
+        df,
         switch(
-          as.integer(input$timeselect),
-          basisOfRecord,
-          kingdom,
-          phylum,
-          order,
-          family,
-          genus,
-          species
+          input$timeselect,
+          "basisOfRecord" = basisOfRecord,
+          "kingdom" = kingdom,
+          "phylum" = phylum,
+          "order" = order,
+          "family" = family,
+          "genus" = genus,
+          "species" = species,
+          "name" = name,
+          "missing_name" = missing_name,
+          "scientificName" = scientificName,
+          "identifiedBy" = identifiedBy,
+          "recordNumber" = recordNumber,
+          "typeStatus" = typeStatus
         ),
         year
       ) %>%
@@ -392,21 +605,27 @@ mod_temporal_server <- function(input, output, session, data_temporal){
           )
         )
     } else if(length(selections())==1){
-      data_temporal() %>%
+      df %>%
         filter(
           year %in% 
             selections()
         ) %>%
         count(
           switch(
-            as.integer(input$timeselect),
-            basisOfRecord,
-            kingdom,
-            phylum,
-            order,
-            family,
-            genus,
-            species
+            input$timeselect,
+            "basisOfRecord" = basisOfRecord,
+            "kingdom" = kingdom,
+            "phylum" = phylum,
+            "order" = order,
+            "family" = family,
+            "genus" = genus,
+            "species" = species,
+            "name" = name,
+            "missing_name" = missing_name,
+            "scientificName" = scientificName,
+            "identifiedBy" = identifiedBy,
+            "recordNumber" = recordNumber,
+            "typeStatus" = typeStatus
           ),
           month
         ) %>%
@@ -475,21 +694,27 @@ mod_temporal_server <- function(input, output, session, data_temporal){
           )
         )
     } else {
-      data_temporal() %>%
+      df %>%
         filter(
           month %in% 
             selections()
         ) %>%
         count(
           switch(
-            as.integer(input$timeselect),
-            basisOfRecord,
-            kingdom,
-            phylum,
-            order,
-            family,
-            genus,
-            species
+            input$timeselect,
+            "basisOfRecord" = basisOfRecord,
+            "kingdom" = kingdom,
+            "phylum" = phylum,
+            "order" = order,
+            "family" = family,
+            "genus" = genus,
+            "species" = species,
+            "name" = name,
+            "missing_name" = missing_name,
+            "scientificName" = scientificName,
+            "identifiedBy" = identifiedBy,
+            "recordNumber" = recordNumber,
+            "typeStatus" = typeStatus
           ),
           day
         ) %>%
