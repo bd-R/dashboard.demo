@@ -16,6 +16,7 @@
 mod_dataSummary_ui <- function(id) {
   ns <- NS(id)
   fluidPage(
+    
     fluidRow(
       style = 'padding-bottom:0px;',
       column(
@@ -182,22 +183,36 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
   ns <- session$ns
   
   output$gauge_one <- flexdashboard::renderGauge({
+    dat <- dataset()
+    if("verbatimLatitude" %in% colnames(dat))
+    {
+      latitudeName <- "verbatimLatitude"
+    }else {
+      latitudeName <- "decimalLatitude"
+    }
+    
+    if("verbatimLongitude" %in% colnames(dat))
+    {
+      longitudeName <- "verbatimLongitude"
+    }else {
+      longitudeName <- "decimalLatitude"
+    }
     validate(
       need(length(dataset())>0, 'Please upload/download a dataset first')
     )
     df <- dataset()
-  
+
     latitude <- round(
       (
         (
           nrow(
-            df["decimalLatitude"]) - sum(
+            df[latitudeName]) - sum(
               is.na(
-                df["decimalLatitude"]
+                df[latitudeName]
               )
             )
         ) / nrow(
-          df["decimalLatitude"]
+          df[latitudeName]
         )
       ),
       2
@@ -207,13 +222,13 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
       (
         (
           nrow(
-            df["decimalLongitude"]) - sum(
+            df[latitudeName]) - sum(
               is.na(
-                df["decimalLongitude"]
+                df[latitudeName]
               )
             )
         ) / nrow(
-          df["decimalLongitude"]
+          df[latitudeName]
         )
       ),
       2
@@ -240,22 +255,40 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
   })
     
   output$gauge_two <- flexdashboard::renderGauge({
-    validate(
-      need(length(dataset())>0, 'Please upload/download a dataset first')
-    )
     df <- dataset()
+    columnName <- 'year'
+    if('dateModified' %in% colnames(df)){
+      columnName <- 'dateModified'
+    } else if('datecollected' %in% colnames(df)){
+      columnName <- 'datecollected'
+    } else if('begin_date' %in% colnames(df)){
+      columnName <- 'begin_date'
+    } else if('date' %in% colnames(df)){
+      columnName <- 'date'
+    } else if('observed_on' %in% colnames(df)){
+      columnName <- 'observed_on'
+    } 
+    validate(
+      need(length(df)>0, 'Please upload/download a dataset first')
+    )
+    validate(
+      need(columnName %in% colnames(df), 'No appropriate Column with Date data present in Database!')
+    )
+    
+    
+    
     
     countryRecord <- round(
       (
         (
           nrow(
-            df["countryCode"]) - sum(
+            df[columnName]) - sum(
               is.na(
-                df["countryCode"]
+                df[columnName]
               )
             )
         ) / nrow(
-          df["countryCode"]
+          df[columnName]
         )
       ),
       2
@@ -276,8 +309,20 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
   })
     
   output$gauge_three <- flexdashboard::renderGauge({
+    df <- dataset()
+    occurance_column_name <- 'occurrenceID'
+    if('uri' %in% colnames(df)){
+      occurance_column_name <- 'uri'
+    } else if ('remote_resource' %in% colnames(df)){
+    occurance_column_name <- 'remote_resource'
+    }
+
     validate(
       need(length(dataset())>0, 'Please upload/download a dataset first')
+    )
+    
+    validate(
+      need(occurance_column_name %in% colnames(df), 'No appropriate Column found with occurance remark data/link')
     )
     df <- dataset()
       
@@ -285,13 +330,13 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
       (
         (
           nrow(
-            df["institutionCode"]) - sum(
+            df[occurance_column_name]) - sum(
               is.na(
-                df["institutionCode"]
+                df[occurance_column_name]
               )
             )
         ) / nrow(
-          df["institutionCode"]
+          df[occurance_column_name]
         )
       ),
       2
@@ -302,7 +347,7 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
       min = 0,
       max = 100,
       symbol = "%",
-      label = "% of records\nwith occurence remark",
+      label = "% of records\nwith occurence remark/link",
       gaugeSectors(
         success = c(80, 100),
         warning = c(40, 79),
@@ -312,8 +357,13 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
   })
     
   output$gauge_four <- flexdashboard::renderGauge({
+    
     validate(
       need(length(dataset())>0, 'Please upload/download a dataset first')
+    )
+    
+    validate(
+      need('basisOfRecord' %in% colnames(dataset()), 'No appropriate Column found with basisOfRecord data')
     )
     df <- dataset()
     
@@ -338,7 +388,7 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
       min = 0,
       max = 100,
       symbol = "%",
-      label = "% of records\nwith eventTime data",
+      label = "% of records\nwith basisOfRecord data",
       gaugeSectors(
         success = c(80, 100),
         warning = c(40, 79),
@@ -350,11 +400,12 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
     
 
   output$box_a <- shinydashboard::renderValueBox({
+    
     validate(
       need(length(dataset())>0, 'Please upload/download a dataset first')
     )
     shinydashboard::valueBox(
-      value = (nrow(dataset()["decimalLatitude"])),
+      value = (nrow(dataset())),
       subtitle = "# of Records",
       icon = icon("compass"),
       color = "aqua",
@@ -366,8 +417,12 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
     validate(
       need(length(dataset())>0, 'Please upload/download a dataset first')
     )
+    
+    validate(
+      need('name' %in% colnames(dataset()), 'No appropriate Column found')
+    )
     shinydashboard::valueBox(
-      value = nrow(unique(dataset()["scientificName"])),
+      value = nrow(unique(dataset()["name"])),
       subtitle = "# of Taxa",
       icon = icon("file-signature"),
       color = "blue",
@@ -392,13 +447,27 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
     
   #Spatial.......................................
   output$geo_coordinates <- shinydashboard::renderInfoBox({
+    dat <- dataset()
+    if("verbatimLatitude" %in% colnames(dat))
+    {
+      latitudeName <- "verbatimLatitude"
+    }else {
+      latitudeName <- "decimalLatitude"
+    }
+    
+    if("verbatimLongitude" %in% colnames(dat))
+    {
+      longitudeName <- "verbatimLongitude"
+    }else {
+      longitudeName <- "decimalLatitude"
+    }
     validate(
       need(length(dataset())>0, 'Please upload/download a dataset first')
     )
     latitude <- nrow(
       (
         na.omit(
-          dataset()["decimalLatitude"]
+          dataset()[latitudeName]
         )
       )
     )
@@ -406,7 +475,7 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
     longitude <- nrow(
       (
         na.omit(
-          dataset()["decimalLongitude"]
+          dataset()[longitudeName]
         )
       )
     )
@@ -425,15 +494,33 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
   })
     
   output$country_code <- shinydashboard::renderInfoBox({
+    df <- dataset()
+    
+    country_code_column_name <- 'countryCode'
+    if('place_guess' %in% colnames(df)){
+      country_code_column_name <- 'place_guess'
+    } else if('calculatedCountry' %in% colnames(df)){
+      country_code_column_name <- 'calculatedCountry'
+    } else if('country' %in% colnames(df)){
+      country_code_column_name <- 'country'
+    } else if('country' %in% colnames(df)){
+      country_code_column_name <- 'country'
+    } 
+    
     validate(
-      need(length(dataset())>0, 'Please upload/download a dataset first')
+      need(length(df)>0, 'Please upload/download a dataset first')
     )
+    
+    validate(
+      need(country_code_column_name %in% colnames(df), 'No appropriate Column found with country names in it.')
+    )
+    
     shinydashboard::infoBox(
       "# of Countries",
       nrow(
         unique(
           na.omit(
-            dataset()["countryCode"]
+            dataset()[country_code_column_name]
           )
         )
       ),
@@ -447,6 +534,11 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
     validate(
       need(length(dataset())>0, 'Please upload/download a dataset first')
     )
+    
+    validate(
+      need('locality' %in% colnames(dataset()), 'No appropriate Column found with locality data.')
+    )
+    
     shinydashboard::infoBox(
       "# of Localities",
       nrow(
@@ -487,17 +579,40 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
     validate(
       need(length(dataset())>0, 'Please upload/download a dataset first')
     )
+    df <- dataset()
+    min_year <- ""
+    
+    if('datecollected' %in% colnames(df)){
+      min_year <- (substr(na.omit(df$datecollected),1,4))
+    }  else if('begin_date' %in% colnames(df)){
+      min_year <- (substr(na.omit(df$begin_date),1,4))
+    } else if('date' %in% colnames(df)){
+      min_year <- (substr(na.omit(df$date),1,4))
+    } else if('observed_on' %in% colnames(df)){
+      min_year <- (substr(na.omit(df$observed_on),1,4))
+    } else if('year' %in% colnames(df)){
+      min_year <- substr(na.omit(df$year),1,4)
+    }
+    
+    min <- min_year[1]
+    for(val in min_year){
+      if(val == ""){
+        next()
+      }
+      if(val < min){
+        min <- val
+      }
+    }
+
+    
+    
+    
+    validate(
+      need(length(min_year)>0, 'No column found with year data')
+    )
     shinydashboard::infoBox(
       "Starting Year",
-      min(
-        na.omit(
-          as.data.frame(
-            (
-              dataset()["year"]
-            )
-          )
-        )
-      ),
+      min,
       icon = icon("stripe-s"),
       color = "olive",
       width = 6
@@ -508,17 +623,38 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
     validate(
       need(length(dataset())>0, 'Please upload/download a dataset first')
     )
+    df <- dataset()
+    max_year <- ""
+    if('datecollected' %in% colnames(df)){
+      max_year <- (substr(na.omit(df$datecollected),1,4))
+    }  else if('begin_date' %in% colnames(df)){
+      max_year <- (substr(na.omit(df$begin_date),1,4))
+    } else if('date' %in% colnames(df)){
+      max_year <- (substr(na.omit(df$date),1,4))
+    } else if('observed_on' %in% colnames(df)){
+      max_year <- (substr(na.omit(df$observed_on),1,4))
+    } else if('year' %in% colnames(df)){
+      max_year <- substr(na.omit(df$year),1,4)
+    }
+    
+    max <- max_year[1]
+    for(val in max_year){
+      if(val == ""){
+        next()
+      }
+      if(val > max){
+        max <- val
+      }
+    }
+    
+
+    
+    validate(
+      need(length(max_year)>0, 'No column found with year data')
+    )
     shinydashboard::infoBox(
       "End Year",
-      max(
-        na.omit(
-          as.data.frame(
-            (
-              dataset()["year"]
-            )
-          )
-        )
-      ),
+      max,
       icon = icon("etsy"),
       color = "olive",
       width = 6
@@ -530,6 +666,10 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
   output$kingdom <- shinydashboard::renderInfoBox({
     validate(
       need(length(dataset())>0, 'Please upload/download a dataset first')
+    )
+    
+    validate(
+      need('kingdom' %in% colnames(dataset()), 'No appropriate Column found with kingdom Records.')
     )
     shinydashboard::infoBox(
       "# of Kingdom",
@@ -550,6 +690,10 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
     validate(
       need(length(dataset())>0, 'Please upload/download a dataset first')
     )
+    
+    validate(
+      need('phylum' %in% colnames(dataset()), 'No appropriate Column found with phylum Records.')
+    )
     shinydashboard::infoBox(
       "# of Phylum",
       nrow(
@@ -568,6 +712,10 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
   output$order <- shinydashboard::renderInfoBox({
     validate(
       need(length(dataset())>0, 'Please upload/download a dataset first')
+    )
+    
+    validate(
+      need('order' %in% colnames(dataset()), 'No appropriate Column found with order Records.')
     )
     shinydashboard::infoBox(
       "# of Order",
@@ -588,6 +736,10 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
     validate(
       need(length(dataset())>0, 'Please upload/download a dataset first')
     )
+    
+    validate(
+      need('family' %in% colnames(dataset()), 'No appropriate Column found with family Records.')
+    )
     shinydashboard::infoBox(
       "# of Family",
       nrow(
@@ -604,8 +756,14 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
   })
     
   output$genus <- shinydashboard::renderInfoBox({
+    
+    
     validate(
       need(length(dataset())>0, 'Please upload/download a dataset first')
+    )
+    
+    validate(
+      need('genus' %in% colnames(dataset()), 'No appropriate Column found with genus Records.')
     )
     shinydashboard::infoBox(
       "# of Genus",
@@ -625,6 +783,10 @@ mod_dataSummary_server <- function(input, output, session, dataset) {
   output$species <- shinydashboard::renderInfoBox({
     validate(
       need(length(dataset())>0, 'Please upload/download a dataset first')
+    )
+    
+    validate(
+      need('species' %in% colnames(dataset()), 'No appropriate Column found with species Records.')
     )
     shinydashboard::infoBox(
       "# of Species",

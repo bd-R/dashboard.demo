@@ -18,23 +18,50 @@ mod_missing_data_ui <- function(id) {
   fluidPage(
     fluidRow(
       tabsetPanel(
+        id = ns("first_tabset"),
         tabPanel(
           "Spatial",
+          value = "spatial",
           formattable::formattableOutput(
             ns("spatial_table")
           )
         ),
         tabPanel(
           "Temporal",
+          value = "temporal",
           formattable::formattableOutput(
             ns("temporal_table")
           )
         ),
         tabPanel(
           "Taxonomic",
+          value = "taxonomic",
           formattable::formattableOutput(
             ns("taxonomic_table" )
           )
+        )
+      )
+    ),
+    tags$br(),
+    tags$br(),
+    h4("List of Important Columns Not Present in Dataset"),
+    fluidRow(
+      tabsetPanel(
+        id = ns("second_tabset"),
+        tabPanel(
+          "Spatial",
+          value = "spatial",
+          formattable::formattableOutput(ns("spatial_missing"))
+        ),
+        tabPanel(
+          "Temporal",
+          value = "temporal",
+          formattable::formattableOutput(ns("temporal_missing"))
+        ),
+        tabPanel(
+          "Taxonomic",
+          value = "taxonomic",
+          formattable::formattableOutput(ns("taxonomic_missing"))
         )
       )
     )
@@ -49,12 +76,15 @@ mod_missing_data_ui <- function(id) {
 
 mod_missing_data_server <- function(input, output, session, dataset_missing) {
   ns <- session$ns
+  
+
   #Calculating missing data and create the table for spatial Tab
   output$spatial_table <- formattable::renderFormattable({
     validate(
       need(length(dataset_missing())>0, 'Please upload/download a dataset first')
     )
     df <- dataset_missing()
+    missing_name <- vector()
     names <- vector()
     total_records <- vector()
     missing_records <- vector()
@@ -64,6 +94,8 @@ mod_missing_data_server <- function(input, output, session, dataset_missing) {
       "locality",
       "decimalLatitude",
       "decimalLongitude",
+      "verbatimLatitude",
+      "verbatimLongitude",
       "coordinateUncertaintyInMeters",
       "coordinatePrecision",
       "elevation",
@@ -108,11 +140,28 @@ mod_missing_data_server <- function(input, output, session, dataset_missing) {
             2
           ) * 100
         )
+      }else {
+        missing_name <- c(missing_name,i)
       }
     }
     
     
-      
+    output$spatial_missing <- formattable::renderFormattable({
+      table <- data.frame(missing_name)
+      formattable::formattable(
+        table,
+        align = c(
+          "c",
+          rep(
+            "l",
+            NCOL(
+              table
+            ) - 1
+          )
+        )
+      )
+    })
+    
     table <- data.frame(
       names,
       total_records,
@@ -152,6 +201,7 @@ mod_missing_data_server <- function(input, output, session, dataset_missing) {
     )
     df <- dataset_missing()
     names <- vector()
+    missing_name <- vector()
     total_records <- vector()
     missing_records <- vector()
     records_percentage <- vector()
@@ -162,7 +212,12 @@ mod_missing_data_server <- function(input, output, session, dataset_missing) {
         "month",
         "year",
         "dateIdentified",
-        "lastInterpreted"
+        "lastInterpreted",
+        "dateModified",
+        "datecollected",
+        "begin_date",
+        "observed_on",
+        "date"
       )
     
     for(i in temporal_column){
@@ -200,8 +255,26 @@ mod_missing_data_server <- function(input, output, session, dataset_missing) {
             2
           ) * 100
         )
+      }else {
+        missing_name <- c(missing_name,i)
       }
     }
+    
+    output$temporal_missing <- formattable::renderFormattable({
+      table <- data.frame(missing_name)
+      formattable::formattable(
+        table,
+        align = c(
+          "c",
+          rep(
+            "l",
+            NCOL(
+              table
+            ) - 1
+          )
+        )
+      )
+    })
       
     
     table <- data.frame(
@@ -243,6 +316,7 @@ mod_missing_data_server <- function(input, output, session, dataset_missing) {
     )
     df <- dataset_missing()
     names <- vector()
+    missing_name <- vector()
     total_records <- vector()
     missing_records <- vector()
     records_percentage <- vector()
@@ -254,6 +328,7 @@ mod_missing_data_server <- function(input, output, session, dataset_missing) {
         "family",
         "genus",
         "species",
+        "name",
         "taxonRank",
         "scientificName",
         "taxonKey",
@@ -300,9 +375,27 @@ mod_missing_data_server <- function(input, output, session, dataset_missing) {
             2
           ) * 100
         )
+      } else {
+        missing_name <- c(missing_name,i)
       }
     }
-      
+    
+    output$taxonomic_missing <- formattable::renderFormattable({
+      table <- data.frame(missing_name)
+      formattable::formattable(
+        table,
+        align = c(
+          "c",
+          rep(
+            "l",
+            NCOL(
+              table
+            ) - 1
+          )
+        )
+      )
+    })
+
     table <- data.frame(
       names,
       total_records,
@@ -332,6 +425,25 @@ mod_missing_data_server <- function(input, output, session, dataset_missing) {
           fun = unit.scale
         )
       )
+    )
+  })
+  
+  #Missing Data Record
+  
+  output$temporal_missing <- renderText(missing_temporal)
+  output$taxonomic <- renderText(missing_taxonomic)
+  
+  
+  
+  observeEvent(input$first_tabset, {
+    updateTabsetPanel(session, "second_tabset",
+                      selected = input$first_tabset
+    )
+  })
+  
+  observeEvent(input$second_tabset, {
+    updateTabsetPanel(session, "first_tabset",
+                      selected = input$second_tabset
     )
   })
   
