@@ -56,27 +56,8 @@ mod_spatial_ui <- function(id) {
       selectizeInput(
         ns("show_vars"),
         "Columns to show:",
-        choices = c(
-          "scientificName",
-          "countryCode",
-          "locality",
-          "decimalLatitude",
-          "decimalLongitude",
-          "coordinateUncertaintyInMeters",
-          "coordinatePrecision",
-          "elevation",
-          "elevationAccuracy",
-          "depth",
-          "depthAccuracy",
-          "establishmentMeans",
-          "basisOfRecord",
-          "datasetName"
-        ),
-        multiple = TRUE,
-        selected = c(
-          "scientificName",
-          "basisOfRecord"
-        )
+        choices = NULL,
+        multiple = TRUE
       )
     ),
     fluidRow(
@@ -96,27 +77,84 @@ mod_spatial_server <- function(input, output, session, data) {
   ns <- session$ns
   
   output$mymap <- renderLeaflet({
+    dat <- data()
     validate(
-      need(length(data())>0, 'Please upload/download a dataset first')
+      need(length(dat)>0, 'Please upload/download a dataset first')
     )
+    latitudeName <- "verbatimLatitude"
+    longitudeName <- "verbatimLongitude"
+    
+    if("decimalLatitude" %in% colnames(dat))
+    {
+      latitudeName <- "decimalLatitude"
+    }
+    
+    if("decimalLongitude" %in% colnames(dat))
+    {
+      longitudeName <- "decimalLongitude"
+    }
+    
+    validate(
+      need(longitudeName %in% colnames(dat), 'No location Data available in Databse to plot map')
+    )
+    validate(
+      need(latitudeName %in% colnames(dat), 'No location Data available in Databse to plot map')
+    )
+    
+    switch (latitudeName,
+      "verbatimLatitude" = dat$verbatimLatitude <- as.numeric(dat$verbatimLatitude),
+      "decimalLatitude" = dat$decimalLatitude <- as.numeric(dat$decimalLatitude),
+    )
+    switch (longitudeName,
+      "verbatimLongitude" = dat$verbatimLongitude <- as.numeric(dat$verbatimLongitude),
+      "decimalLongitude" = dat$decimalLongitude <- as.numeric(dat$decimalLongitude),
+    )
+    
     leaflet(
       data = na.omit(
-        data()[c("decimalLatitude", "decimalLongitude")]
+        dat[c(latitudeName, longitudeName)]
       )
     ) %>%
       addProviderTiles(
         input$mapTexture
       ) %>%
       addCircles(
-        ~ decimalLongitude,
-        ~ decimalLatitude,
+
+        switch(
+          longitudeName,
+          "decimalLongitude" = ~decimalLongitude,
+          "verbatimLongitude" = ~verbatimLongitude
+        ),
+        switch(
+          latitudeName,
+          "decimalLatitude" = ~decimalLatitude,
+          "verbatimLatitude" = ~verbatimLatitude
+        ),
         color = input$mapColor
       ) %>%
       fitBounds(
-        ~min(decimalLongitude),
-        ~min(decimalLatitude),
-        ~max(decimalLongitude),
-        ~max(decimalLatitude)
+
+        switch(
+          longitudeName,
+          "decimalLongitude" = ~min(decimalLongitude),
+          "verbatimLongitude" = ~min(verbatimLongitude)
+        ),
+        switch(
+          latitudeName,
+          "decimalLatitude" = ~min(decimalLatitude),
+          "verbatimLatitude" = ~min(verbatimLatitude)
+        ),
+        switch(
+          longitudeName,
+          "decimalLatitude" = ~max(decimalLongitude),
+          "verbatimLatitude" = ~max(verbatimLongitude)
+        ),
+        switch(
+          latitudeName,
+          "decimalLatitude" = ~max(decimalLatitude),
+          "verbatimLatitude" = ~max(verbatimLatitude)
+        )
+        
       ) %>%
       leaflet.extras::addDrawToolbar(
         targetGroup='draw',
@@ -135,6 +173,62 @@ mod_spatial_server <- function(input, output, session, data) {
       ) 
   })
   
+  observe({
+    
+    choices = c(
+      "scientificName",
+      "name",
+      "countryCode",
+      "generalComments",
+      "state_province",
+      "begin_date",
+      "end_date",
+      "locality",
+      "decimalLatitude",
+      "decimalLongitude",
+      "verbatimLongitude",
+      "verbatimLatitude",
+      "coordinateUncertaintyInMeters",
+      "coordinate_uncertainty_in_meters",
+      "coordinatePrecision",
+      "elevation",
+      "elevationAccuracy",
+      "depth",
+      "depthAccuracy",
+      "establishmentMeans",
+      "basisOfRecord",
+      "datasetName",
+      "missing_name",
+      "url",
+      "observation_type",
+      "date",
+      "license",
+      "datecollected",
+      "kingdom",
+      "phylum",
+      "order",
+      "family",
+      "genus",
+      "species",
+      "species_guess"
+    )
+    column_names <- vector()
+    for(i in choices){
+      if(i %in% colnames(data())){
+        column_names <- c(column_names, i)
+      }
+    }
+    
+    # Can also set the label and select items
+    updateSelectInput(session, "show_vars",
+                      "Select columns to show:",
+                      choices = column_names,
+                      selected = tail(column_names, 1)
+    )
+  })
+  
+
+  
   output$table <- DT::renderDataTable({
     validate(
       need(length(data())>0, 'Please upload/download a dataset first')
@@ -145,17 +239,41 @@ mod_spatial_server <- function(input, output, session, data) {
   observeEvent(
     input$mymap_draw_new_feature,
     {
+      dat <- data()
+      
+      latitudeName <- "verbatimLatitude"
+      longitudeName <- "verbatimLongitude"
+      
+      if("decimalLatitude" %in% colnames(dat))
+      {
+        latitudeName <- "decimalLatitude"
+      }
+      
+      if("decimalLongitude" %in% colnames(dat))
+      {
+        longitudeName <- "decimalLongitude"
+      }
+      
+      switch (latitudeName,
+              "verbatimLatitude" = dat$verbatimLatitude <- as.numeric(dat$verbatimLatitude),
+              "decimalLatitude" = dat$decimalLatitude <- as.numeric(dat$decimalLatitude),
+      )
+      switch (longitudeName,
+              "verbatimLongitude" = dat$verbatimLongitude <- as.numeric(dat$verbatimLongitude),
+              "decimalLongitude" = dat$decimalLongitude <- as.numeric(dat$decimalLongitude),
+      )
+      
       output$table <- DT::renderDataTable({
         data <- na.omit(
-          data()[c(
-            "decimalLatitude",
-            "decimalLongitude"
+          dat[c(
+            latitudeName,
+            longitudeName
           )]
         )
         cities_coordinates <- SpatialPointsDataFrame(
           data[,c(
-            "decimalLongitude",
-            "decimalLatitude"
+            longitudeName,
+            latitudeName
           )],
           data
         )
